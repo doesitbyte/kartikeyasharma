@@ -16,6 +16,9 @@ import {
   getExperienceSlug,
   getRelatedExperiences,
 } from "@/lib/utils-data";
+import { AnimatedSection } from "@/app/components/animated-section";
+import { AnimatedGrid } from "@/app/components/animated-grid";
+import { AnimatedHero } from "@/app/components/animated-hero";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -68,7 +71,7 @@ export default async function ExperienceDetailPage({
   return (
     <main className="bg-background text-foreground">
       {/* Hero Section */}
-      <section className="relative border-b border-border bg-background pt-32 pb-16 overflow-hidden">
+      <section className="relative border-b border-border bg-background pb-16 overflow-hidden">
         <div className="relative h-[40vh] min-h-[300px] w-full">
           <Image
             src={experience.image}
@@ -79,7 +82,8 @@ export default async function ExperienceDetailPage({
           />
           <div className="absolute inset-0 bg-black/60" />
           <div className="absolute inset-0 flex items-end">
-            <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10 pb-8 w-full">
+            <AnimatedHero>
+              <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10 pb-8 w-full">
               <Link
                 href="/experience"
                 className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition-colors"
@@ -94,13 +98,14 @@ export default async function ExperienceDetailPage({
               <p className="text-xl md:text-2xl font-semibold text-white/90">
                 {experience.organization}
               </p>
-            </div>
+              </div>
+            </AnimatedHero>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="border-b border-border bg-background py-16">
+      <AnimatedSection className="border-b border-border bg-background py-16">
         <div className="mx-auto max-w-4xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10">
           {/* Key Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -153,16 +158,16 @@ export default async function ExperienceDetailPage({
               </div>
             )}
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* Related Experiences */}
       {relatedExperiences.length > 0 && (
-        <section className="border-b border-border bg-background py-16">
+        <AnimatedSection className="border-b border-border bg-background py-16" delay={0.1}>
           <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10">
             <h2 className="text-2xl md:text-3xl font-bold mb-8">
               {ui_content.experience.detail.other_experiences_title}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedExperiences.map((relatedExp, idx) => {
                 const relatedIndex = data.experiences.findIndex(
                   (e) => e === relatedExp
@@ -192,13 +197,13 @@ export default async function ExperienceDetailPage({
                   </Link>
                 );
               })}
-            </div>
+            </AnimatedGrid>
           </div>
-        </section>
+        </AnimatedSection>
       )}
 
       {/* Navigation CTA */}
-      <section className="relative border-b border-border bg-background py-16 overflow-hidden">
+      <AnimatedSection className="relative border-b border-border bg-background py-16 overflow-hidden" delay={0.2}>
         <FooterBackground />
         <div className="relative mx-auto max-w-4xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -228,7 +233,7 @@ export default async function ExperienceDetailPage({
             </Link>
           </div>
         </div>
-      </section>
+      </AnimatedSection>
     </main>
   );
 }
