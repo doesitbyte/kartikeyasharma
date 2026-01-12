@@ -4,7 +4,6 @@ import type { data as DataType } from "@/lib/data";
 
 export async function GET() {
   try {
-    // Fetch all sections from Redis
     const [
       personal_info,
       skills,
@@ -20,8 +19,12 @@ export async function GET() {
       redis.get<typeof DataType.experiences>(REDIS_KEYS.experiences),
       redis.get<typeof DataType.education>(REDIS_KEYS.education),
       redis.get<typeof DataType.achievements>(REDIS_KEYS.achievements),
-      redis.get<typeof DataType.publications_and_presentations>(REDIS_KEYS.publications),
-      redis.get<typeof DataType.hobbies_interests_and_extracurricular>(REDIS_KEYS.extracurricular),
+      redis.get<typeof DataType.publications_and_presentations>(
+        REDIS_KEYS.publications
+      ),
+      redis.get<typeof DataType.hobbies_interests_and_extracurricular>(
+        REDIS_KEYS.extracurricular
+      ),
       redis.get<typeof DataType.ui_content>(REDIS_KEYS.ui_content),
     ]);
 
@@ -42,8 +45,7 @@ export async function GET() {
       );
     }
 
-    // Return data in the same structure as lib/data.ts
-    const data: typeof DataType = {
+    return NextResponse.json({
       personal_information: personal_info,
       skills_and_expertise: skills,
       experiences,
@@ -52,9 +54,7 @@ export async function GET() {
       publications_and_presentations: publications,
       hobbies_interests_and_extracurricular: extracurricular,
       ui_content,
-    };
-
-    return NextResponse.json(data);
+    } as unknown as typeof DataType);
   } catch (error) {
     console.error("Error fetching data:", error);
     return NextResponse.json(

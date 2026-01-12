@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 interface HeroSectionProps {
   name: string;
@@ -56,7 +57,12 @@ export function HeroSection({
         waveOpacity={isDark ? 0.5 : 0.3}
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10 py-28 md:py-36 text-center">
-          <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="max-w-4xl mx-auto"
+          >
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-4 text-foreground">
               {name}
             </h1>
@@ -83,7 +89,7 @@ export function HeroSection({
                 </Button>
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </WavyBackground>
     </section>

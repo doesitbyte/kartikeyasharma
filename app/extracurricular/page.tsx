@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { FooterBackground } from "@/components/ui/footer-background";
 import { getAllData } from "@/lib/get-data";
+import { AnimatedSection } from "@/app/components/animated-section";
+import { AnimatedGrid } from "@/app/components/animated-grid";
+import { AnimatedHero } from "@/app/components/animated-hero";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -29,7 +32,7 @@ export default async function Extracurricular() {
   return (
     <main className="bg-background text-foreground">
       {/* Hero Section with Image */}
-      <section className="relative border-b border-border bg-background pt-32 pb-0 overflow-hidden">
+      <section className="relative border-b border-border bg-background pb-0 overflow-hidden">
         <div className="relative h-[50vh] min-h-[400px] w-full">
           <Image
             src={ui_content.extracurricular.hero_image}
@@ -40,21 +43,23 @@ export default async function Extracurricular() {
           />
           <div className="absolute inset-0 bg-black/50" />
           <div className="absolute inset-0 flex items-end">
-            <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10 pb-8 w-full">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-2 text-white">
-                {ui_content.extracurricular.hero.title}
-              </h1>
-              <div className="h-1 w-24 bg-white mb-4" />
-              <p className="text-xl md:text-2xl font-semibold text-white/90">
-                {ui_content.extracurricular.hero.subtitle}
-              </p>
-            </div>
+            <AnimatedHero>
+              <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10 pb-8 w-full">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-2 text-white">
+                  {ui_content.extracurricular.hero.title}
+                </h1>
+                <div className="h-1 w-24 bg-white mb-4" />
+                <p className="text-xl md:text-2xl font-semibold text-white/90">
+                  {ui_content.extracurricular.hero.subtitle}
+                </p>
+              </div>
+            </AnimatedHero>
           </div>
         </div>
       </section>
 
       {/* Student Athlete Section */}
-      <section className="border-b border-border bg-background py-16">
+      <AnimatedSection className="border-b border-border bg-background py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10">
           <TracingBeam scrollProgressThreshold={0.7}>
             <div className="flex items-center gap-3 mb-8">
@@ -63,7 +68,7 @@ export default async function Extracurricular() {
                 {ui_content.extracurricular.student_athlete_label}
               </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+            <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
               {student_athlete.map((item, index) => (
                 <div
                   key={index}
@@ -87,7 +92,7 @@ export default async function Extracurricular() {
                   </div>
                 </div>
               ))}
-            </div>
+            </AnimatedGrid>
 
             {/* Sports Coach Section */}
             <div className="mt-16">
@@ -97,7 +102,7 @@ export default async function Extracurricular() {
                   {ui_content.extracurricular.sports_coach_label}
                 </h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+              <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
                 {sports_coach.map((item, index) => (
                   <div
                     key={index}
@@ -121,7 +126,7 @@ export default async function Extracurricular() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </AnimatedGrid>
             </div>
 
             {/* Other Interests Section */}
@@ -132,7 +137,7 @@ export default async function Extracurricular() {
                   {ui_content.extracurricular.other_interests_label}
                 </h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+              <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
                 {others.map((interest, index) => (
                   <div
                     key={index}
@@ -153,14 +158,14 @@ export default async function Extracurricular() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </AnimatedGrid>
             </div>
           </TracingBeam>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* CTA Section */}
-      <section className="relative border-b border-border bg-muted/10 py-16 overflow-hidden">
+      <AnimatedSection className="relative border-b border-border bg-muted/10 py-16 overflow-hidden" delay={0.1}>
         <FooterBackground />
         <div className="relative mx-auto max-w-4xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -190,7 +195,7 @@ export default async function Extracurricular() {
             </Link>
           </div>
         </div>
-      </section>
+      </AnimatedSection>
     </main>
   );
 }

@@ -31,23 +31,17 @@ export async function GET(
     const { section } = await params;
 
     if (!isValidSection(section)) {
-      return NextResponse.json(
-        { error: "Invalid section" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid section" }, { status: 400 });
     }
 
     const redisKey = REDIS_KEYS[SECTION_TO_KEY[section]];
     const data = await redis.get(redisKey);
 
     if (!data) {
-      return NextResponse.json(
-        { error: "Section not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Section not found" }, { status: 404 });
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(data as typeof DataType[typeof section]);
   } catch (error) {
     console.error("Error fetching section:", error);
     return NextResponse.json(
@@ -65,10 +59,7 @@ export async function POST(
     const { section } = await params;
 
     if (!isValidSection(section)) {
-      return NextResponse.json(
-        { error: "Invalid section" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid section" }, { status: 400 });
     }
 
     const body = await request.json();
@@ -76,17 +67,11 @@ export async function POST(
 
     // Verify password
     if (!password || password !== process.env.ADMIN_PASSWORD) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!data) {
-      return NextResponse.json(
-        { error: "Data is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Data is required" }, { status: 400 });
     }
 
     const redisKey = REDIS_KEYS[SECTION_TO_KEY[section]];

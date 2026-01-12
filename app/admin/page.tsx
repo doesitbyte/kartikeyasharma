@@ -4,10 +4,22 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { fetchAllData, updateSection, type Section } from "@/lib/api";
-import type { data as DataType } from "@/lib/data";
+import { data } from "@/lib/data";
+type DataType = typeof data;
+
+// Utility type to make readonly types mutable
+type DeepMutable<T> = T extends readonly (infer U)[]
+  ? U[]
+  : T extends Record<string, any>
+  ? {
+      -readonly [P in keyof T]: DeepMutable<T[P]>;
+    }
+  : T;
+
+type MutableDataType = DeepMutable<DataType>;
 
 export default function AdminPage() {
-  const [localData, setLocalData] = useState<DataType | null>(null);
+  const [localData, setLocalData] = useState<MutableDataType | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +52,7 @@ export default function AdminPage() {
       setLoading(true);
       setError(null);
       const data = await fetchAllData();
-      setLocalData(data);
+      setLocalData(JSON.parse(JSON.stringify(data)) as MutableDataType);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
@@ -60,9 +72,8 @@ export default function AdminPage() {
       setSaving(true);
       setError(null);
 
-      // Save the active section
       const sectionData = localData[activeSection];
-      await updateSection(activeSection, sectionData, password);
+      await updateSection(activeSection, sectionData as any, password);
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2000);
@@ -374,7 +385,7 @@ function PersonalInformationEditor({
   data,
   onChange,
 }: {
-  data: DataType["personal_information"];
+  data: MutableDataType["personal_information"];
   onChange: (field: string, value: string) => void;
 }) {
   return (
@@ -387,7 +398,7 @@ function PersonalInformationEditor({
           </label>
           <input
             type="text"
-            value={value}
+            value={String(value ?? "")}
             onChange={(e) => onChange(key, e.target.value)}
             className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
@@ -455,8 +466,8 @@ function ExperiencesEditor({
   experiences,
   onChange,
 }: {
-  experiences: DataType["experiences"];
-  onChange: (experiences: DataType["experiences"]) => void;
+  experiences: MutableDataType["experiences"];
+  onChange: (experiences: MutableDataType["experiences"]) => void;
 }) {
   const updateExperience = (index: number, field: string, value: any) => {
     const newExperiences = [...experiences];
@@ -470,24 +481,30 @@ function ExperiencesEditor({
     value: string
   ) => {
     const newExperiences = [...experiences];
-    newExperiences[expIndex].responsibilities = [
+    const responsibilities = [
       ...newExperiences[expIndex].responsibilities,
-    ];
-    newExperiences[expIndex].responsibilities[respIndex] = value;
+    ] as string[];
+    responsibilities[respIndex] = value;
+    (newExperiences[expIndex] as any).responsibilities = responsibilities;
     onChange(newExperiences);
   };
 
   const addResponsibility = (expIndex: number) => {
     const newExperiences = [...experiences];
-    newExperiences[expIndex].responsibilities.push("");
+    const responsibilities = [
+      ...newExperiences[expIndex].responsibilities,
+    ] as string[];
+    responsibilities.push("");
+    (newExperiences[expIndex] as any).responsibilities = responsibilities;
     onChange(newExperiences);
   };
 
   const removeResponsibility = (expIndex: number, respIndex: number) => {
     const newExperiences = [...experiences];
-    newExperiences[expIndex].responsibilities = newExperiences[
-      expIndex
-    ].responsibilities.filter((_, i) => i !== respIndex);
+    const responsibilities = newExperiences[expIndex].responsibilities.filter(
+      (_: string, i: number) => i !== respIndex
+    ) as string[];
+    (newExperiences[expIndex] as any).responsibilities = responsibilities;
     onChange(newExperiences);
   };
 
@@ -501,12 +518,12 @@ function ExperiencesEditor({
         institution: "",
         image: "",
         responsibilities: [],
-      },
+      } as any,
     ]);
   };
 
   const removeExperience = (index: number) => {
-    onChange(experiences.filter((_, i) => i !== index));
+    onChange(experiences.filter((_: any, i: number) => i !== index));
   };
 
   return (
@@ -517,7 +534,7 @@ function ExperiencesEditor({
           Add Experience
         </Button>
       </div>
-      {experiences.map((exp, expIndex) => (
+      {experiences.map((exp: any, expIndex: number) => (
         <div
           key={expIndex}
           className="border border-border rounded-lg p-4 space-y-4"
@@ -542,7 +559,7 @@ function ExperiencesEditor({
                   </label>
                   <input
                     type="text"
-                    value={value}
+                    value={String(value ?? "")}
                     onChange={(e) =>
                       updateExperience(expIndex, key, e.target.value)
                     }
@@ -564,7 +581,7 @@ function ExperiencesEditor({
                 Add Responsibility
               </Button>
             </div>
-            {exp.responsibilities.map((resp, respIndex) => (
+            {exp.responsibilities.map((resp: string, respIndex: number) => (
               <div key={respIndex} className="flex gap-2 mb-2">
                 <textarea
                   value={resp}
@@ -594,8 +611,8 @@ function EducationEditor({
   education,
   onChange,
 }: {
-  education: DataType["education"];
-  onChange: (education: DataType["education"]) => void;
+  education: MutableDataType["education"];
+  onChange: (education: MutableDataType["education"]) => void;
 }) {
   const updateEducation = (index: number, field: string, value: string) => {
     const newEducation = [...education];
@@ -611,12 +628,12 @@ function EducationEditor({
         institution: "",
         duration: "",
         image: "",
-      },
+      } as any,
     ]);
   };
 
   const removeEducation = (index: number) => {
-    onChange(education.filter((_, i) => i !== index));
+    onChange(education.filter((_: any, i: number) => i !== index));
   };
 
   return (
@@ -627,7 +644,7 @@ function EducationEditor({
           Add Education
         </Button>
       </div>
-      {education.map((edu, index) => (
+      {education.map((edu: any, index: number) => (
         <div
           key={index}
           className="border border-border rounded-lg p-4 space-y-4"
@@ -650,7 +667,7 @@ function EducationEditor({
                 </label>
                 <input
                   type="text"
-                  value={value}
+                  value={String(value ?? "")}
                   onChange={(e) => updateEducation(index, key, e.target.value)}
                   className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
@@ -668,8 +685,8 @@ function AchievementsEditor({
   achievements,
   onChange,
 }: {
-  achievements: DataType["achievements"];
-  onChange: (achievements: DataType["achievements"]) => void;
+  achievements: MutableDataType["achievements"];
+  onChange: (achievements: MutableDataType["achievements"]) => void;
 }) {
   const updateAchievement = (index: number, field: string, value: string) => {
     const newAchievements = [...achievements];
@@ -685,12 +702,12 @@ function AchievementsEditor({
         date: "",
         description: "",
         image: "",
-      },
+      } as any,
     ]);
   };
 
   const removeAchievement = (index: number) => {
-    onChange(achievements.filter((_, i) => i !== index));
+    onChange(achievements.filter((_: any, i: number) => i !== index));
   };
 
   return (
@@ -701,7 +718,7 @@ function AchievementsEditor({
           Add Achievement
         </Button>
       </div>
-      {achievements.map((achievement, index) => (
+      {achievements.map((achievement: any, index: number) => (
         <div
           key={index}
           className="border border-border rounded-lg p-4 space-y-4"
@@ -724,7 +741,7 @@ function AchievementsEditor({
                 </label>
                 {key === "description" ? (
                   <textarea
-                    value={value}
+                    value={String(value ?? "")}
                     onChange={(e) =>
                       updateAchievement(index, key, e.target.value)
                     }
@@ -733,7 +750,7 @@ function AchievementsEditor({
                 ) : (
                   <input
                     type="text"
-                    value={value}
+                    value={String(value ?? "")}
                     onChange={(e) =>
                       updateAchievement(index, key, e.target.value)
                     }
@@ -754,8 +771,10 @@ function PublicationsEditor({
   publications,
   onChange,
 }: {
-  publications: DataType["publications_and_presentations"];
-  onChange: (publications: DataType["publications_and_presentations"]) => void;
+  publications: MutableDataType["publications_and_presentations"];
+  onChange: (
+    publications: MutableDataType["publications_and_presentations"]
+  ) => void;
 }) {
   const updatePublication = (
     index: number,
@@ -776,12 +795,12 @@ function PublicationsEditor({
         publisher: "",
         year: new Date().getFullYear(),
         image: "",
-      },
+      } as any,
     ]);
   };
 
   const removePublication = (index: number) => {
-    onChange(publications.filter((_, i) => i !== index));
+    onChange(publications.filter((_: any, i: number) => i !== index));
   };
 
   return (
@@ -792,7 +811,7 @@ function PublicationsEditor({
           Add Publication/Talk
         </Button>
       </div>
-      {publications.map((pub, index) => (
+      {publications.map((pub: any, index: number) => (
         <div
           key={index}
           className="border border-border rounded-lg p-4 space-y-4"
@@ -834,7 +853,7 @@ function PublicationsEditor({
                   {key === "year" ? (
                     <input
                       type="number"
-                      value={value}
+                      value={Number(value) || 0}
                       onChange={(e) =>
                         updatePublication(
                           index,
@@ -847,7 +866,7 @@ function PublicationsEditor({
                   ) : (
                     <input
                       type="text"
-                      value={value || ""}
+                      value={String(value ?? "")}
                       onChange={(e) =>
                         updatePublication(index, key, e.target.value)
                       }
@@ -868,9 +887,9 @@ function ExtracurricularEditor({
   extracurricular,
   onChange,
 }: {
-  extracurricular: DataType["hobbies_interests_and_extracurricular"];
+  extracurricular: MutableDataType["hobbies_interests_and_extracurricular"];
   onChange: (
-    extracurricular: DataType["hobbies_interests_and_extracurricular"]
+    extracurricular: MutableDataType["hobbies_interests_and_extracurricular"]
   ) => void;
 }) {
   const updateStudentAthlete = (
@@ -924,11 +943,11 @@ function ExtracurricularEditor({
           <Button
             onClick={() => {
               const newExtracurricular = { ...extracurricular };
-              newExtracurricular.student_athlete.push({
+              (newExtracurricular.student_athlete as any[]).push({
                 achievement: "",
-                year: new Date().getFullYear(),
+                year: new Date().getFullYear() as any,
                 image: "",
-              });
+              } as any);
               onChange(newExtracurricular);
             }}
             size="sm"
@@ -936,7 +955,7 @@ function ExtracurricularEditor({
             Add
           </Button>
         </div>
-        {extracurricular.student_athlete.map((item, index) => (
+        {extracurricular.student_athlete.map((item: any, index: number) => (
           <div
             key={index}
             className="border border-border rounded-lg p-4 space-y-4"
@@ -948,7 +967,7 @@ function ExtracurricularEditor({
                   const newExtracurricular = { ...extracurricular };
                   newExtracurricular.student_athlete =
                     newExtracurricular.student_athlete.filter(
-                      (_, i) => i !== index
+                      (_: any, i: number) => i !== index
                     );
                   onChange(newExtracurricular);
                 }}
@@ -966,7 +985,7 @@ function ExtracurricularEditor({
                 {key === "year" ? (
                   <input
                     type="text"
-                    value={value}
+                    value={String(value ?? "")}
                     onChange={(e) =>
                       updateStudentAthlete(index, key, e.target.value)
                     }
@@ -975,7 +994,7 @@ function ExtracurricularEditor({
                 ) : (
                   <input
                     type="text"
-                    value={value}
+                    value={String(value ?? "")}
                     onChange={(e) =>
                       updateStudentAthlete(index, key, e.target.value)
                     }
@@ -995,11 +1014,11 @@ function ExtracurricularEditor({
           <Button
             onClick={() => {
               const newExtracurricular = { ...extracurricular };
-              newExtracurricular.sports_coach.push({
+              (newExtracurricular.sports_coach as any[]).push({
                 role: "",
-                year: new Date().getFullYear(),
+                year: new Date().getFullYear() as any,
                 image: "",
-              });
+              } as any);
               onChange(newExtracurricular);
             }}
             size="sm"
@@ -1007,7 +1026,7 @@ function ExtracurricularEditor({
             Add
           </Button>
         </div>
-        {extracurricular.sports_coach.map((item, index) => (
+        {extracurricular.sports_coach.map((item: any, index: number) => (
           <div
             key={index}
             className="border border-border rounded-lg p-4 space-y-4"
@@ -1019,7 +1038,7 @@ function ExtracurricularEditor({
                   const newExtracurricular = { ...extracurricular };
                   newExtracurricular.sports_coach =
                     newExtracurricular.sports_coach.filter(
-                      (_, i) => i !== index
+                      (_: any, i: number) => i !== index
                     );
                   onChange(newExtracurricular);
                 }}
@@ -1036,7 +1055,7 @@ function ExtracurricularEditor({
                 </label>
                 <input
                   type="text"
-                  value={value}
+                  value={String(value ?? "")}
                   onChange={(e) =>
                     updateSportsCoach(
                       index,
@@ -1059,10 +1078,10 @@ function ExtracurricularEditor({
           <Button
             onClick={() => {
               const newExtracurricular = { ...extracurricular };
-              newExtracurricular.others.push({
+              (newExtracurricular.others as any[]).push({
                 title: "",
                 image: "",
-              });
+              } as any);
               onChange(newExtracurricular);
             }}
             size="sm"
@@ -1070,7 +1089,7 @@ function ExtracurricularEditor({
             Add
           </Button>
         </div>
-        {extracurricular.others.map((item, index) => (
+        {extracurricular.others.map((item: any, index: number) => (
           <div
             key={index}
             className="border border-border rounded-lg p-4 space-y-4"
@@ -1081,7 +1100,7 @@ function ExtracurricularEditor({
                 onClick={() => {
                   const newExtracurricular = { ...extracurricular };
                   newExtracurricular.others = newExtracurricular.others.filter(
-                    (_, i) => i !== index
+                    (_: any, i: number) => i !== index
                   );
                   onChange(newExtracurricular);
                 }}
@@ -1098,7 +1117,7 @@ function ExtracurricularEditor({
                 </label>
                 <input
                   type="text"
-                  value={value}
+                  value={String(value ?? "")}
                   onChange={(e) => updateOthers(index, key, e.target.value)}
                   className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />

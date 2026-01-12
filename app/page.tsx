@@ -17,14 +17,18 @@ import {
   getAchievementSlug,
   getPublicationSlug,
 } from "@/lib/utils-data";
+import { AnimatedSection } from "@/app/components/animated-section";
+import { AnimatedGrid } from "@/app/components/animated-grid";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Home",
-  description: "PhD student at DTU Health Tech developing tissue interfacing ingestible bioelectronic devices enabled by mechanical energy harvesting for sensing, sampling and drug delivery applications.",
+  title: "Home | Kartikeya Sharma",
+  description:
+    "PhD student at DTU Health Tech developing tissue interfacing ingestible bioelectronic devices enabled by mechanical energy harvesting for sensing, sampling and drug delivery applications.",
   openGraph: {
     title: "Kartikeya Sharma | Home",
-    description: "PhD student at DTU Health Tech developing tissue interfacing ingestible bioelectronic devices enabled by mechanical energy harvesting for sensing, sampling and drug delivery applications.",
+    description:
+      "PhD student at DTU Health Tech developing tissue interfacing ingestible bioelectronic devices enabled by mechanical energy harvesting for sensing, sampling and drug delivery applications.",
   },
 };
 
@@ -71,12 +75,12 @@ export default async function Home() {
       />
 
       {/* Quick Links Section */}
-      <section className="border-t border-border bg-background py-16">
+      <AnimatedSection className="border-t border-border bg-background py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
             {ui_content.home.explore_section.title}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatedGrid className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Link href="/about" className="group">
               <div className="h-full border rounded-none p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
                 <div className="flex items-center gap-4 mb-4">
@@ -196,12 +200,15 @@ export default async function Home() {
                 </div>
               </div>
             </Link>
-          </div>
+          </AnimatedGrid>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* Featured Highlights Section */}
-      <section className="border-t border-border bg-background py-16">
+      <AnimatedSection
+        className="border-t border-border bg-background py-16"
+        delay={0.1}
+      >
         <div className="mx-auto max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-12">
             {ui_content.home.recent_highlights.title}
@@ -292,10 +299,13 @@ export default async function Home() {
             )}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* Contact CTA Section */}
-      <section className="relative border-t border-border bg-background py-16 overflow-hidden">
+      <AnimatedSection
+        className="relative border-t border-border bg-background py-16 overflow-hidden"
+        delay={0.2}
+      >
         <FooterBackground />
         <div className="relative mx-auto max-w-4xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -323,7 +333,7 @@ export default async function Home() {
             </Link>
           </div>
         </div>
-      </section>
+      </AnimatedSection>
     </main>
   );
 }

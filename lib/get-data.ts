@@ -56,5 +56,5 @@ export const getAllData = cache(async (): Promise<typeof DataType> => {
     publications_and_presentations: publications,
     hobbies_interests_and_extracurricular: extracurricular,
     ui_content,
-  };
+  } as unknown as typeof DataType;
 });
