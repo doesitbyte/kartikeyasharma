@@ -20,6 +20,7 @@ export function AnimatedGrid({ children, className = "" }: AnimatedGridProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
+          style={{ display: "contents" }}
         >
           {child}
         </motion.div>
