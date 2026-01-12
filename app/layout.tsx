@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "~/components/header";
 import { Sidebar } from "~/components/sidebar";
 import { Footer } from "~/components/footer";
+import { BottomNav } from "@/app/components/bottom-nav";
 import { ThemeProvider } from "next-themes";
 import { getAllData } from "@/lib/get-data";
 
@@ -55,6 +56,7 @@ export default async function RootLayout({
           <div style={{ paddingTop: "var(--header-height, 96px)" }}>
             {children}
           </div>
+          <BottomNav />
           <Footer
             personal_information={personal_information}
             ui_content={ui_content}
