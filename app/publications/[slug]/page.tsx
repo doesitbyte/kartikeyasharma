@@ -1,6 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, BookOpen, Calendar, Building2, Mic, ArrowRight } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  Calendar,
+  Building2,
+  Mic,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FooterBackground } from "@/components/ui/footer-background";
 import { getData } from "@/lib/data-loader";
@@ -17,9 +24,12 @@ interface PublicationDetailPageProps {
   }>;
 }
 
-export default async function PublicationDetailPage({ params }: PublicationDetailPageProps) {
+export default async function PublicationDetailPage({
+  params,
+}: PublicationDetailPageProps) {
   const { slug } = await params;
-  const result = findPublicationBySlug(slug);
+  const data = await getData();
+  const result = findPublicationBySlug(slug, data);
 
   if (!result) {
     notFound();
@@ -135,11 +145,17 @@ export default async function PublicationDetailPage({ params }: PublicationDetai
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedItems.map((relatedItem, idx) => {
-                const relatedIndex = data.publications_and_presentations.findIndex((p) => p === relatedItem);
+                const relatedIndex =
+                  data.publications_and_presentations.findIndex(
+                    (p) => p === relatedItem
+                  );
                 return (
                   <Link
                     key={idx}
-                    href={`/publications/${getPublicationSlug(relatedItem, relatedIndex)}`}
+                    href={`/publications/${getPublicationSlug(
+                      relatedItem,
+                      relatedIndex
+                    )}`}
                     className="group border border-border p-6 hover:shadow-lg transition-all hover:-translate-y-1"
                   >
                     <div className="flex items-center gap-2 mb-2">
@@ -149,16 +165,22 @@ export default async function PublicationDetailPage({ params }: PublicationDetai
                         <Mic className="h-4 w-4 text-muted-foreground" />
                       )}
                       <span className="text-xs text-muted-foreground uppercase">
-                        {relatedItem.type === "publication" ? "Publication" : "Talk"}
+                        {relatedItem.type === "publication"
+                          ? "Publication"
+                          : "Talk"}
                       </span>
                     </div>
                     <h3 className="text-xl font-bold mb-2 group-hover:text-link transition-colors line-clamp-2">
                       {relatedItem.title}
                     </h3>
                     <p className="text-sm text-muted-foreground mb-2">
-                      {relatedItem.type === "publication" ? relatedItem.publisher : relatedItem.organization}
+                      {relatedItem.type === "publication"
+                        ? relatedItem.publisher
+                        : relatedItem.organization}
                     </p>
-                    <p className="text-xs text-muted-foreground mb-4">{relatedItem.year}</p>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      {relatedItem.year}
+                    </p>
                     <div className="text-sm font-semibold text-link group-hover:underline">
                       {ui_content.publications.detail.view_details}
                       <ArrowRight className="inline h-4 w-4 ml-1" />

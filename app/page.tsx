@@ -36,7 +36,8 @@ export default async function Home() {
 
   // Get most recent publication
   const recentPublication = publications_and_presentations.find(
-    (item) => item.type === "publication"
+    (item): item is typeof publications_and_presentations[number] & { type: "publication" } =>
+      item.type === "publication"
   );
   const recentPublicationIndex = recentPublication
     ? publications_and_presentations.findIndex((p) => p === recentPublication)
@@ -267,7 +268,9 @@ export default async function Home() {
                   {recentPublication.title}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  {recentPublication.publisher} • {recentPublication.year}
+                  {recentPublication.type === "publication" 
+                    ? `${recentPublication.publisher} • ${recentPublication.year}`
+                    : recentPublication.year.toString()}
                 </p>
                 <div className="text-sm font-semibold text-link group-hover:underline">
                   {ui_content.home.recent_highlights.view_details}{" "}

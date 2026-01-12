@@ -99,21 +99,30 @@ export function findAchievementBySlug(slug: string, data: typeof DataType): { ac
 /**
  * Get related experiences (other experiences from the same organization or similar)
  */
-export function getRelatedExperiences(currentIndex: number, data: typeof DataType, limit: number = 3): typeof DataType.experiences {
+export function getRelatedExperiences(currentIndex: number, data: typeof DataType, limit: number = 3): Array<typeof DataType.experiences[number]> {
   return data.experiences
     .filter((_, index) => index !== currentIndex)
     .slice(0, limit);
 }
 
 /**
- * Get related publications (same year or same publisher)
+ * Get related publications (same year or same publisher/organization)
  */
-export function getRelatedPublications(currentIndex: number, data: typeof DataType, limit: number = 3): typeof DataType.publications_and_presentations {
+export function getRelatedPublications(currentIndex: number, data: typeof DataType, limit: number = 3): Array<typeof DataType.publications_and_presentations[number]> {
   const current = data.publications_and_presentations[currentIndex];
   return data.publications_and_presentations
     .filter((item, index) => {
       if (index === currentIndex) return false;
-      return item.year === current.year || item.publisher === current.publisher;
+      // Match by year
+      if (item.year === current.year) return true;
+      // Match by publisher/organization based on type
+      if (current.type === "publication" && item.type === "publication") {
+        return item.publisher === current.publisher;
+      }
+      if (current.type === "invited_talk" && item.type === "invited_talk") {
+        return item.organization === current.organization;
+      }
+      return false;
     })
     .slice(0, limit);
 }
@@ -121,7 +130,7 @@ export function getRelatedPublications(currentIndex: number, data: typeof DataTy
 /**
  * Get related achievements (same year or similar type)
  */
-export function getRelatedAchievements(currentIndex: number, data: typeof DataType, limit: number = 3): typeof DataType.achievements {
+export function getRelatedAchievements(currentIndex: number, data: typeof DataType, limit: number = 3): Array<typeof DataType.achievements[number]> {
   const current = data.achievements[currentIndex];
   const currentYear = current.date.match(/\d{4}/)?.[0];
   return data.achievements

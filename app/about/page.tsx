@@ -16,6 +16,10 @@ import { getData } from "@/lib/data-loader";
 export default async function About() {
   const data = await getData();
   const { personal_information, skills_and_expertise, education, ui_content } = data;
+  
+  // Type assertions for TypeScript
+  type EducationItem = typeof education[number];
+  type Skill = string;
 
   return (
     <main className="bg-background text-foreground">
@@ -100,7 +104,7 @@ export default async function About() {
                 <h2 className="text-2xl md:text-3xl font-bold">{ui_content.about.education_label}</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
-                {education.map((edu, index) => (
+                {education.map((edu: EducationItem, index: number) => (
                   <div
                     key={index}
                     className="border border-border overflow-hidden group hover:shadow-lg transition-shadow"
@@ -137,7 +141,7 @@ export default async function About() {
               </div>
               <div className="max-w-4xl">
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {skills_and_expertise.map((skill, index) => (
+                  {skills_and_expertise.map((skill: Skill, index: number) => (
                     <li
                       key={index}
                       className="flex items-start gap-3 text-base text-muted-foreground"

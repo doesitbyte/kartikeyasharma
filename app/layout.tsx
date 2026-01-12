@@ -34,7 +34,10 @@ export default async function RootLayout({
           <div style={{ paddingTop: "var(--header-height, 96px)" }}>
             {children}
           </div>
-          <Footer personal_information={personal_information} ui_content={ui_content} />
+          <Footer
+            personal_information={personal_information}
+            ui_content={ui_content}
+          />
         </ThemeProvider>
       </body>
     </html>

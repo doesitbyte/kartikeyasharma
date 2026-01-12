@@ -84,7 +84,10 @@ export function Header() {
 
   // Set CSS variable for header height so pages can use it
   useEffect(() => {
-    document.documentElement.style.setProperty("--header-height", `${headerHeight}px`);
+    document.documentElement.style.setProperty(
+      "--header-height",
+      `${headerHeight}px`
+    );
   }, [headerHeight]);
 
   return (
