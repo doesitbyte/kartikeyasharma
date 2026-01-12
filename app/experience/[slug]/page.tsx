@@ -10,13 +10,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
 import {
   findExperienceBySlug,
   getExperienceSlug,
   getRelatedExperiences,
 } from "@/lib/utils-data";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 interface ExperienceDetailPageProps {
   params: Promise<{
@@ -24,11 +25,36 @@ interface ExperienceDetailPageProps {
   }>;
 }
 
+export async function generateMetadata({
+  params,
+}: ExperienceDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const data = await getAllData();
+  const result = findExperienceBySlug(slug, data);
+
+  if (!result) {
+    return {
+      title: "Experience Not Found",
+    };
+  }
+
+  const { experience } = result;
+  
+  return {
+    title: `${experience.position} at ${experience.organization}`,
+    description: `${experience.position} at ${experience.organization}, ${experience.institution}. ${experience.duration}.`,
+    openGraph: {
+      title: `${experience.position} at ${experience.organization}`,
+      description: `${experience.position} at ${experience.organization}, ${experience.institution}. ${experience.duration}.`,
+    },
+  };
+}
+
 export default async function ExperienceDetailPage({
   params,
 }: ExperienceDetailPageProps) {
   const { slug } = await params;
-  const data = await getData();
+  const data = await getAllData();
   const result = findExperienceBySlug(slug, data);
 
   if (!result) {

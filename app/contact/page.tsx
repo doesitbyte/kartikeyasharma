@@ -10,11 +10,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { personal_information, ui_content } = await getAllData();
+  
+  return {
+    title: "Contact",
+    description: ui_content.contact.hero.subtitle,
+    openGraph: {
+      title: `Contact ${personal_information.name}`,
+      description: ui_content.contact.hero.subtitle,
+    },
+  };
+}
 
 export default async function Contact() {
-  const data = await getData();
-  const { personal_information, ui_content } = data;
+  const { personal_information, ui_content } = await getAllData();
 
   return (
     <main className="bg-background text-foreground">

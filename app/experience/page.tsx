@@ -4,12 +4,25 @@ import { Briefcase, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
 import { getExperienceSlug } from "@/lib/utils-data";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { ui_content } = await getAllData();
+  
+  return {
+    title: "Experience",
+    description: ui_content.experience.hero.subtitle,
+    openGraph: {
+      title: "Professional Experience | Kartikeya Sharma",
+      description: ui_content.experience.hero.subtitle,
+    },
+  };
+}
 
 export default async function Experience() {
-  const data = await getData();
-  const { experiences, ui_content } = data;
+  const { experiences, ui_content } = await getAllData();
 
   return (
     <main className="bg-background text-foreground">

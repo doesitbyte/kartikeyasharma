@@ -4,12 +4,25 @@ import { Award, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
 import { getAchievementSlug } from "@/lib/utils-data";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { ui_content } = await getAllData();
+  
+  return {
+    title: "Achievements",
+    description: ui_content.achievements.hero.subtitle,
+    openGraph: {
+      title: "Achievements & Awards | Kartikeya Sharma",
+      description: ui_content.achievements.hero.subtitle,
+    },
+  };
+}
 
 export default async function Achievements() {
-  const data = await getData();
-  const { achievements, ui_content } = data;
+  const { achievements, ui_content } = await getAllData();
 
   return (
     <main className="bg-background text-foreground">

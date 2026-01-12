@@ -3,94 +3,46 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-type DataType = {
-  personal_information: {
-    name: string;
-    tagline: string;
-    email: string;
-    linkedin: string;
-    orcid: string;
-  };
-  skills_and_expertise: string[];
-  experiences: Array<{
-    position: string;
-    duration: string;
-    organization: string;
-    institution: string;
-    image: string;
-    responsibilities: string[];
-  }>;
-  education: Array<{
-    degree: string;
-    institution: string;
-    duration: string;
-    image: string;
-  }>;
-  achievements: Array<{
-    title: string;
-    date: string;
-    description: string;
-    image: string;
-  }>;
-  publications_and_presentations: Array<{
-    type: string;
-    title: string;
-    publisher?: string;
-    organization?: string;
-    year: number;
-    image: string;
-  }>;
-  hobbies_interests_and_extracurricular: {
-    student_athlete: Array<{
-      achievement: string;
-      year: string | number;
-      image: string;
-    }>;
-    sports_coach: Array<{
-      role: string;
-      year: string | number;
-      image: string;
-    }>;
-    others: Array<{
-      title: string;
-      image: string;
-    }>;
-  };
-  ui_content: Record<string, any>;
-};
-
-type Section = 
-  | "personal_information"
-  | "skills_and_expertise"
-  | "experiences"
-  | "education"
-  | "achievements"
-  | "publications_and_presentations"
-  | "hobbies_interests_and_extracurricular"
-  | "ui_content";
+import { fetchAllData, updateSection, type Section } from "@/lib/api";
+import type { data as DataType } from "@/lib/data";
 
 export default function AdminPage() {
-  const [data, setData] = useState<DataType | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [localData, setLocalData] = useState<DataType | null>(null);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
-  const [activeSection, setActiveSection] = useState<Section>("personal_information");
+  const [activeSection, setActiveSection] = useState<Section>(
+    "personal_information"
+  );
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (authenticated) {
+      loadData();
+    }
+  }, [authenticated]);
+
+  const handleLogin = () => {
+    if (!password) {
+      setError("Please enter a password");
+      return;
+    }
+    // Simple password check - password is verified on save
+    setAuthenticated(true);
+    setError(null);
+    setPassword("");
+  };
 
   const loadData = async () => {
     try {
-      const response = await fetch("/api/data");
-      if (!response.ok) throw new Error("Failed to load data");
-      const json = await response.json();
-      setData(json);
+      setLoading(true);
       setError(null);
+      const data = await fetchAllData();
+      setLocalData(data);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {
@@ -98,77 +50,35 @@ export default function AdminPage() {
     }
   };
 
-  const handleLogin = async () => {
-    // Verify password with API
-    try {
-      const response = await fetch("/api/data", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${password}`,
-        },
-        body: JSON.stringify({}), // Empty body just for auth check
-      });
-      
-      if (response.ok) {
-        setAuthenticated(true);
-        setError(null);
-        // Store password in sessionStorage for subsequent requests
-        sessionStorage.setItem("admin_password", password);
-        setPassword(""); // Clear password from state
-      } else {
-        setError("Invalid password");
-      }
-    } catch (err) {
-      setError("Failed to authenticate");
-    }
-  };
-
   const handleSave = async () => {
-    if (!data) return;
-    
-    setSaving(true);
-    setError(null);
-    setSuccess(false);
+    if (!localData || !password) {
+      setError("Password is required to save changes");
+      return;
+    }
 
     try {
-      // Get password from sessionStorage (set during login)
-      const storedPassword = sessionStorage.getItem("admin_password");
-      if (!storedPassword) {
-        setError("Not authenticated. Please login again.");
-        setAuthenticated(false);
-        return;
-      }
+      setSaving(true);
+      setError(null);
 
-      const response = await fetch("/api/data", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${storedPassword}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save");
-      }
+      // Save the active section
+      const sectionData = localData[activeSection];
+      await updateSection(activeSection, sectionData, password);
 
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save data");
+      setError(err instanceof Error ? err.message : "Failed to save changes");
     } finally {
       setSaving(false);
     }
   };
 
   const updateNestedValue = (path: string[], value: any) => {
-    if (!data) return;
-    
-    const newData = { ...data };
+    if (!localData) return;
+
+    const newData = { ...localData };
     let current: any = newData;
-    
+
     for (let i = 0; i < path.length - 1; i++) {
       if (Array.isArray(current[path[i]])) {
         current = current[path[i]];
@@ -177,61 +87,69 @@ export default function AdminPage() {
       current[path[i]] = { ...current[path[i]] };
       current = current[path[i]];
     }
-    
+
     current[path[path.length - 1]] = value;
-    setData(newData);
+    setLocalData(newData);
   };
 
-  const updateArrayItem = (path: string[], index: number, field: string, value: any) => {
-    if (!data) return;
-    
-    const newData = { ...data };
+  const updateArrayItem = (
+    path: string[],
+    index: number,
+    field: string,
+    value: any
+  ) => {
+    if (!localData) return;
+
+    const newData = { ...localData };
     let current: any = newData;
-    
+
     for (const key of path) {
       current = current[key];
     }
-    
+
     const newArray = [...current];
     newArray[index] = { ...newArray[index], [field]: value };
-    
+
     let parent: any = newData;
     for (let i = 0; i < path.length - 1; i++) {
       parent = parent[path[i]];
     }
     parent[path[path.length - 1]] = newArray;
-    
-    setData(newData);
+
+    setLocalData(newData);
   };
 
   const addArrayItem = (path: string[], newItem: any) => {
-    if (!data) return;
-    
-    const newData = { ...data };
+    if (!localData) return;
+
+    const newData = { ...localData };
     let current: any = newData;
-    
+
     for (let i = 0; i < path.length - 1; i++) {
       current = current[path[i]];
     }
-    
-    current[path[path.length - 1]] = [...current[path[path.length - 1]], newItem];
-    setData(newData);
+
+    current[path[path.length - 1]] = [
+      ...current[path[path.length - 1]],
+      newItem,
+    ];
+    setLocalData(newData);
   };
 
   const removeArrayItem = (path: string[], index: number) => {
-    if (!data) return;
-    
-    const newData = { ...data };
+    if (!localData) return;
+
+    const newData = { ...localData };
     let current: any = newData;
-    
+
     for (let i = 0; i < path.length - 1; i++) {
       current = current[path[i]];
     }
-    
+
     current[path[path.length - 1]] = current[path[path.length - 1]].filter(
       (_: any, i: number) => i !== index
     );
-    setData(newData);
+    setLocalData(newData);
   };
 
   if (loading) {
@@ -246,7 +164,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-full max-w-md p-8 space-y-4">
-          <h1 className="text-2xl font-bold">Admin Login</h1>
+          <h1 className="text-2xl font-bold">Admin Panel</h1>
           <div className="space-y-2">
             <input
               type="password"
@@ -266,7 +184,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!data) {
+  if (!localData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg text-destructive">Failed to load data</div>
@@ -280,7 +198,10 @@ export default function AdminPage() {
     { key: "experiences", label: "Experiences" },
     { key: "education", label: "Education" },
     { key: "achievements", label: "Achievements" },
-    { key: "publications_and_presentations", label: "Publications & Presentations" },
+    {
+      key: "publications_and_presentations",
+      label: "Publications & Presentations",
+    },
     { key: "hobbies_interests_and_extracurricular", label: "Extracurricular" },
     { key: "ui_content", label: "UI Content" },
   ];
@@ -293,20 +214,35 @@ export default function AdminPage() {
           <div className="flex gap-2">
             <Button
               onClick={() => {
-                sessionStorage.removeItem("admin_password");
                 setAuthenticated(false);
+                setPassword("");
               }}
               variant="outline"
             >
               Logout
             </Button>
-            <Button onClick={loadData} variant="outline">
-              Reload
+            <Button onClick={loadData} variant="outline" disabled={loading}>
+              {loading ? "Loading..." : "Reload"}
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving || !password}>
               {saving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
+        </div>
+
+        <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500 rounded-md text-blue-600 dark:text-blue-400">
+          <strong>Note:</strong> Data is loaded from Upstash Redis. Enter your
+          password below to save changes.
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter password to enable saving"
+            className="w-full max-w-md px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          />
         </div>
 
         {error && (
@@ -317,7 +253,7 @@ export default function AdminPage() {
 
         {success && (
           <div className="mb-4 p-4 bg-green-500/10 border border-green-500 rounded-md text-green-600 dark:text-green-400">
-            Data saved successfully!
+            Data reloaded from static file!
           </div>
         )}
 
@@ -347,7 +283,7 @@ export default function AdminPage() {
             <div className="bg-card border border-border rounded-lg p-6">
               {activeSection === "personal_information" && (
                 <PersonalInformationEditor
-                  data={data.personal_information}
+                  data={localData.personal_information}
                   onChange={(field, value) =>
                     updateNestedValue(["personal_information", field], value)
                   }
@@ -356,7 +292,7 @@ export default function AdminPage() {
 
               {activeSection === "skills_and_expertise" && (
                 <ArrayEditor
-                  items={data.skills_and_expertise}
+                  items={localData.skills_and_expertise}
                   label="Skill"
                   onChange={(items) =>
                     updateNestedValue(["skills_and_expertise"], items)
@@ -366,7 +302,7 @@ export default function AdminPage() {
 
               {activeSection === "experiences" && (
                 <ExperiencesEditor
-                  experiences={data.experiences}
+                  experiences={localData.experiences}
                   onChange={(experiences) =>
                     updateNestedValue(["experiences"], experiences)
                   }
@@ -375,7 +311,7 @@ export default function AdminPage() {
 
               {activeSection === "education" && (
                 <EducationEditor
-                  education={data.education}
+                  education={localData.education}
                   onChange={(education) =>
                     updateNestedValue(["education"], education)
                   }
@@ -384,7 +320,7 @@ export default function AdminPage() {
 
               {activeSection === "achievements" && (
                 <AchievementsEditor
-                  achievements={data.achievements}
+                  achievements={localData.achievements}
                   onChange={(achievements) =>
                     updateNestedValue(["achievements"], achievements)
                   }
@@ -393,25 +329,33 @@ export default function AdminPage() {
 
               {activeSection === "publications_and_presentations" && (
                 <PublicationsEditor
-                  publications={data.publications_and_presentations}
+                  publications={localData.publications_and_presentations}
                   onChange={(publications) =>
-                    updateNestedValue(["publications_and_presentations"], publications)
+                    updateNestedValue(
+                      ["publications_and_presentations"],
+                      publications
+                    )
                   }
                 />
               )}
 
               {activeSection === "hobbies_interests_and_extracurricular" && (
                 <ExtracurricularEditor
-                  extracurricular={data.hobbies_interests_and_extracurricular}
+                  extracurricular={
+                    localData.hobbies_interests_and_extracurricular
+                  }
                   onChange={(extracurricular) =>
-                    updateNestedValue(["hobbies_interests_and_extracurricular"], extracurricular)
+                    updateNestedValue(
+                      ["hobbies_interests_and_extracurricular"],
+                      extracurricular
+                    )
                   }
                 />
               )}
 
               {activeSection === "ui_content" && (
                 <UIContentEditor
-                  uiContent={data.ui_content}
+                  uiContent={localData.ui_content}
                   onChange={(uiContent) =>
                     updateNestedValue(["ui_content"], uiContent)
                   }
@@ -520,7 +464,11 @@ function ExperiencesEditor({
     onChange(newExperiences);
   };
 
-  const updateResponsibility = (expIndex: number, respIndex: number, value: string) => {
+  const updateResponsibility = (
+    expIndex: number,
+    respIndex: number,
+    value: string
+  ) => {
     const newExperiences = [...experiences];
     newExperiences[expIndex].responsibilities = [
       ...newExperiences[expIndex].responsibilities,
@@ -605,7 +553,9 @@ function ExperiencesEditor({
           </div>
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium">Responsibilities</label>
+              <label className="block text-sm font-medium">
+                Responsibilities
+              </label>
               <Button
                 onClick={() => addResponsibility(expIndex)}
                 size="sm"
@@ -929,7 +879,9 @@ function ExtracurricularEditor({
     value: string | number
   ) => {
     const newExtracurricular = { ...extracurricular };
-    newExtracurricular.student_athlete = [...newExtracurricular.student_athlete];
+    newExtracurricular.student_athlete = [
+      ...newExtracurricular.student_athlete,
+    ];
     newExtracurricular.student_athlete[index] = {
       ...newExtracurricular.student_athlete[index],
       [field]: value,
@@ -994,9 +946,10 @@ function ExtracurricularEditor({
               <Button
                 onClick={() => {
                   const newExtracurricular = { ...extracurricular };
-                  newExtracurricular.student_athlete = newExtracurricular.student_athlete.filter(
-                    (_, i) => i !== index
-                  );
+                  newExtracurricular.student_athlete =
+                    newExtracurricular.student_athlete.filter(
+                      (_, i) => i !== index
+                    );
                   onChange(newExtracurricular);
                 }}
                 variant="destructive"
@@ -1064,9 +1017,10 @@ function ExtracurricularEditor({
               <Button
                 onClick={() => {
                   const newExtracurricular = { ...extracurricular };
-                  newExtracurricular.sports_coach = newExtracurricular.sports_coach.filter(
-                    (_, i) => i !== index
-                  );
+                  newExtracurricular.sports_coach =
+                    newExtracurricular.sports_coach.filter(
+                      (_, i) => i !== index
+                    );
                   onChange(newExtracurricular);
                 }}
                 variant="destructive"

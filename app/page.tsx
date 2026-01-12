@@ -11,22 +11,31 @@ import {
 import { Button } from "@/components/ui/button";
 import { HeroSection } from "@/app/components/hero-section";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
 import {
   getExperienceSlug,
   getAchievementSlug,
   getPublicationSlug,
 } from "@/lib/utils-data";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home",
+  description: "PhD student at DTU Health Tech developing tissue interfacing ingestible bioelectronic devices enabled by mechanical energy harvesting for sensing, sampling and drug delivery applications.",
+  openGraph: {
+    title: "Kartikeya Sharma | Home",
+    description: "PhD student at DTU Health Tech developing tissue interfacing ingestible bioelectronic devices enabled by mechanical energy harvesting for sensing, sampling and drug delivery applications.",
+  },
+};
 
 export default async function Home() {
-  const data = await getData();
   const {
     personal_information,
     achievements,
     publications_and_presentations,
     experiences,
     ui_content,
-  } = data;
+  } = await getAllData();
 
   // Get most recent achievement
   const recentAchievement = achievements[0];

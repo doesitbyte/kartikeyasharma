@@ -11,11 +11,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { personal_information, ui_content } = await getAllData();
+  
+  return {
+    title: "About",
+    description: ui_content.about.bio,
+    openGraph: {
+      title: `About ${personal_information.name}`,
+      description: ui_content.about.bio,
+    },
+  };
+}
 
 export default async function About() {
-  const data = await getData();
-  const { personal_information, skills_and_expertise, education, ui_content } = data;
+  const { personal_information, skills_and_expertise, education, ui_content } = await getAllData();
   
   // Type assertions for TypeScript
   type EducationItem = typeof education[number];

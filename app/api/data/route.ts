@@ -1,71 +1,64 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";
+import { NextResponse } from "next/server";
+import { redis, REDIS_KEYS } from "@/lib/redis";
+import type { data as DataType } from "@/lib/data";
 
-const DATA_KEY = "portfolio_data";
-
-// Initialize Upstash Redis client
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
-
-// GET - Read data from Upstash Redis
 export async function GET() {
   try {
-    const data = await redis.get(DATA_KEY);
-    if (!data) {
+    // Fetch all sections from Redis
+    const [
+      personal_info,
+      skills,
+      experiences,
+      education,
+      achievements,
+      publications,
+      extracurricular,
+      ui_content,
+    ] = await Promise.all([
+      redis.get<typeof DataType.personal_information>(REDIS_KEYS.personal_info),
+      redis.get<string[]>(REDIS_KEYS.skills),
+      redis.get<typeof DataType.experiences>(REDIS_KEYS.experiences),
+      redis.get<typeof DataType.education>(REDIS_KEYS.education),
+      redis.get<typeof DataType.achievements>(REDIS_KEYS.achievements),
+      redis.get<typeof DataType.publications_and_presentations>(REDIS_KEYS.publications),
+      redis.get<typeof DataType.hobbies_interests_and_extracurricular>(REDIS_KEYS.extracurricular),
+      redis.get<typeof DataType.ui_content>(REDIS_KEYS.ui_content),
+    ]);
+
+    // Check if data exists
+    if (
+      !personal_info ||
+      !skills ||
+      !experiences ||
+      !education ||
+      !achievements ||
+      !publications ||
+      !extracurricular ||
+      !ui_content
+    ) {
       return NextResponse.json(
-        { error: "No data found in Redis" },
+        { error: "Data not initialized. Please run the migration script." },
         { status: 404 }
       );
     }
+
+    // Return data in the same structure as lib/data.ts
+    const data: typeof DataType = {
+      personal_information: personal_info,
+      skills_and_expertise: skills,
+      experiences,
+      education,
+      achievements,
+      publications_and_presentations: publications,
+      hobbies_interests_and_extracurricular: extracurricular,
+      ui_content,
+    };
+
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error reading from Redis:", error);
+    console.error("Error fetching data:", error);
     return NextResponse.json(
-      { error: "Failed to read data from Redis" },
-      { status: 500 }
-    );
-  }
-}
-
-// POST - Update data in Upstash Redis
-export async function POST(request: NextRequest) {
-  try {
-    // Basic authentication check
-    const authHeader = request.headers.get("authorization");
-    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
-
-    if (!authHeader || authHeader !== `Bearer ${adminPassword}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const body = await request.json();
-
-    // Allow empty body for auth check
-    if (Object.keys(body).length === 0) {
-      return NextResponse.json({ success: true, message: "Authenticated" });
-    }
-
-    // Validate that body is an object
-    if (!body || typeof body !== "object") {
-      return NextResponse.json(
-        { error: "Invalid data format" },
-        { status: 400 }
-      );
-    }
-
-    // Write to Upstash Redis
-    await redis.set(DATA_KEY, body);
-    return NextResponse.json({
-      success: true,
-      message: "Data updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating data in Redis:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json(
-      { error: `Failed to update data: ${errorMessage}` },
+      { error: "Failed to fetch data" },
       { status: 500 }
     );
   }

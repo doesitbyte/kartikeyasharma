@@ -3,13 +3,14 @@ import Image from "next/image";
 import { ArrowLeft, Award, Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
 import {
   findAchievementBySlug,
   getAchievementSlug,
   getRelatedAchievements,
 } from "@/lib/utils-data";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 interface AchievementDetailPageProps {
   params: Promise<{
@@ -17,9 +18,34 @@ interface AchievementDetailPageProps {
   }>;
 }
 
+export async function generateMetadata({
+  params,
+}: AchievementDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const data = await getAllData();
+  const result = findAchievementBySlug(slug, data);
+
+  if (!result) {
+    return {
+      title: "Achievement Not Found",
+    };
+  }
+
+  const { achievement } = result;
+  
+  return {
+    title: achievement.title,
+    description: `${achievement.title} - ${achievement.date}. ${achievement.description}`,
+    openGraph: {
+      title: achievement.title,
+      description: `${achievement.title} - ${achievement.date}. ${achievement.description}`,
+    },
+  };
+}
+
 export default async function AchievementDetailPage({ params }: AchievementDetailPageProps) {
   const { slug } = await params;
-  const data = await getData();
+  const data = await getAllData();
   const result = findAchievementBySlug(slug, data);
 
   if (!result) {

@@ -10,13 +10,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
 import {
   findPublicationBySlug,
   getPublicationSlug,
   getRelatedPublications,
 } from "@/lib/utils-data";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 interface PublicationDetailPageProps {
   params: Promise<{
@@ -24,11 +25,38 @@ interface PublicationDetailPageProps {
   }>;
 }
 
+export async function generateMetadata({
+  params,
+}: PublicationDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const data = await getAllData();
+  const result = findPublicationBySlug(slug, data);
+
+  if (!result) {
+    return {
+      title: "Publication Not Found",
+    };
+  }
+
+  const { item } = result;
+  const isPublication = item.type === "publication";
+  const publisher = isPublication ? item.publisher : item.organization;
+  
+  return {
+    title: item.title,
+    description: `${item.title} - ${publisher} (${item.year})`,
+    openGraph: {
+      title: item.title,
+      description: `${item.title} - ${publisher} (${item.year})`,
+    },
+  };
+}
+
 export default async function PublicationDetailPage({
   params,
 }: PublicationDetailPageProps) {
   const { slug } = await params;
-  const data = await getData();
+  const data = await getAllData();
   const result = findPublicationBySlug(slug, data);
 
   if (!result) {

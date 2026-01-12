@@ -4,11 +4,25 @@ import { Award, ArrowRight, Users, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { ui_content } = await getAllData();
+  
+  return {
+    title: "Extracurricular",
+    description: ui_content.extracurricular.hero.subtitle,
+    openGraph: {
+      title: "Extracurricular Activities | Kartikeya Sharma",
+      description: ui_content.extracurricular.hero.subtitle,
+    },
+  };
+}
 
 export default async function Extracurricular() {
-  const data = await getData();
-  const { hobbies_interests_and_extracurricular, ui_content } = data;
+  const { hobbies_interests_and_extracurricular, ui_content } =
+    await getAllData();
   const { student_athlete, sports_coach, others } =
     hobbies_interests_and_extracurricular;
 

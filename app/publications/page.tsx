@@ -4,12 +4,25 @@ import { BookOpen, ArrowRight, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TracingBeam } from "@/components/ui/tracing-beam";
 import { FooterBackground } from "@/components/ui/footer-background";
-import { getData } from "@/lib/data-loader";
+import { getAllData } from "@/lib/get-data";
 import { getPublicationSlug } from "@/lib/utils-data";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { ui_content } = await getAllData();
+  
+  return {
+    title: "Publications",
+    description: ui_content.publications.hero.subtitle,
+    openGraph: {
+      title: "Publications & Presentations | Kartikeya Sharma",
+      description: ui_content.publications.hero.subtitle,
+    },
+  };
+}
 
 export default async function Publications() {
-  const data = await getData();
-  const { publications_and_presentations, ui_content } = data;
+  const { publications_and_presentations, ui_content } = await getAllData();
 
   // Separate publications and invited talks
   const publications = publications_and_presentations
@@ -59,7 +72,7 @@ export default async function Publications() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
               {publications.map((publication, index) => {
-                const pubIndex = data.publications_and_presentations.findIndex(
+                const pubIndex = publications_and_presentations.findIndex(
                   (p) => p === publication
                 );
                 const slug = getPublicationSlug(publication, pubIndex);
@@ -107,10 +120,9 @@ export default async function Publications() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
                   {invitedTalks.map((talk, index) => {
-                    const talkIndex =
-                      data.publications_and_presentations.findIndex(
-                        (p) => p === talk
-                      );
+                    const talkIndex = publications_and_presentations.findIndex(
+                      (p) => p === talk
+                    );
                     const slug = getPublicationSlug(talk, talkIndex);
                     return (
                       <Link
