@@ -1,4 +1,4 @@
-// Data exported from public/data.json for TypeScript compatibility
+// Static data fallback for TypeScript compatibility (used only if Redis fails)
 export const data = {
   personal_information: {
     name: "Kartikeya Sharma",

@@ -15,7 +15,13 @@ interface HeroSectionProps {
   getInTouchButton: string;
 }
 
-export function HeroSection({ name, tagline, bio, learnMoreButton, getInTouchButton }: HeroSectionProps) {
+export function HeroSection({
+  name,
+  tagline,
+  bio,
+  learnMoreButton,
+  getInTouchButton,
+}: HeroSectionProps) {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -31,8 +37,8 @@ export function HeroSection({ name, tagline, bio, learnMoreButton, getInTouchBut
   const darkColors = ["#1e1b4b", "#312e81", "#4338ca", "#6366f1", "#818cf8"];
   const darkBackground = "black";
 
-  // Use light theme by default until mounted (to avoid hydration mismatch)
-  const isDark = mounted && theme === "dark";
+  // Default to dark theme since it's forced, then use actual theme after mount
+  const isDark = !mounted ? true : theme === "dark";
   const colors = isDark ? darkColors : lightColors;
   const backgroundFill = isDark ? darkBackground : lightBackground;
 
