@@ -65,3 +65,23 @@ export async function updateSection<T extends Section>(
     throw new Error(error.error || `Failed to update ${section}`);
   }
 }
+
+/**
+ * Rebuild the search index (requires authentication)
+ */
+export async function rebuildSearchIndex(password: string): Promise<{ count: number; message: string }> {
+  const response = await fetch("/api/search/build-index", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ password }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: response.statusText }));
+    throw new Error(error.error || "Failed to rebuild search index");
+  }
+
+  return response.json();
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { fetchAllData, updateSection, type Section } from "@/lib/api";
+import { fetchAllData, updateSection, rebuildSearchIndex, type Section } from "@/lib/api";
 import { data } from "@/lib/data";
 type DataType = typeof data;
 
@@ -22,8 +22,10 @@ export default function AdminPage() {
   const [localData, setLocalData] = useState<MutableDataType | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [rebuildingIndex, setRebuildingIndex] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>(
@@ -54,7 +56,11 @@ export default function AdminPage() {
       const data = await fetchAllData();
       setLocalData(JSON.parse(JSON.stringify(data)) as MutableDataType);
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
+      setSuccessMessage("Data reloaded successfully!");
+      setTimeout(() => {
+        setSuccess(false);
+        setSuccessMessage(null);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {
@@ -76,11 +82,40 @@ export default function AdminPage() {
       await updateSection(activeSection, sectionData as any, password);
 
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
+      setSuccessMessage("Changes saved successfully!");
+      setTimeout(() => {
+        setSuccess(false);
+        setSuccessMessage(null);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save changes");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRebuildIndex = async () => {
+    if (!password) {
+      setError("Password is required to rebuild search index");
+      return;
+    }
+
+    try {
+      setRebuildingIndex(true);
+      setError(null);
+
+      const result = await rebuildSearchIndex(password);
+
+      setSuccess(true);
+      setSuccessMessage(result.message);
+      setTimeout(() => {
+        setSuccess(false);
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to rebuild search index");
+    } finally {
+      setRebuildingIndex(false);
     }
   };
 
@@ -235,6 +270,13 @@ export default function AdminPage() {
             <Button onClick={loadData} variant="outline" disabled={loading}>
               {loading ? "Loading..." : "Reload"}
             </Button>
+            <Button
+              onClick={handleRebuildIndex}
+              variant="outline"
+              disabled={rebuildingIndex || !password}
+            >
+              {rebuildingIndex ? "Rebuilding..." : "Rebuild Search Index"}
+            </Button>
             <Button onClick={handleSave} disabled={saving || !password}>
               {saving ? "Saving..." : "Save Changes"}
             </Button>
@@ -262,9 +304,9 @@ export default function AdminPage() {
           </div>
         )}
 
-        {success && (
+        {success && successMessage && (
           <div className="mb-4 p-4 bg-green-500/10 border border-green-500 rounded-md text-green-600 dark:text-green-400">
-            Data reloaded from static file!
+            {successMessage}
           </div>
         )}
 

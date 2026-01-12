@@ -42,4 +42,5 @@ export const REDIS_KEYS = {
   publications: "portfolio:publications",
   extracurricular: "portfolio:extracurricular",
   ui_content: "portfolio:ui_content",
+  search_index: "portfolio:search_index",
 } as const;

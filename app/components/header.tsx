@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Search, X, Sun, Moon, Globe } from "lucide-react";
+import { Sun, Moon, Globe } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,12 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { SearchComponent } from "./search";
 
 const THRESHOLD_RATIO = 0.1;
 
 export function Header() {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
@@ -136,52 +136,10 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden items-center gap-2 md:flex">
-              <AnimatePresence>
-                {isSearchOpen && (
-                  <motion.div
-                    initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: 200, opacity: 1 }}
-                    exit={{ width: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      autoFocus
-                      className="h-9 w-[200px] border-b bg-transparent px-0 text-sm focus:outline-none border-black/70 text-black placeholder:text-gray-600 dark:border-white/70 dark:text-white dark:placeholder:text-white/70"
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="text-black hover:bg-black/10 dark:text-white dark:hover:bg-white/20"
-              >
-                {isSearchOpen ? (
-                  <X className={isCondensed ? "h-5 w-5" : "h-6 w-6"} />
-                ) : (
-                  <Search className={isCondensed ? "h-5 w-5" : "h-6 w-6"} />
-                )}
-              </Button>
-            </div>
-            <div className="flex md:hidden">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="text-black hover:bg-black/10 dark:text-white dark:hover:bg-white/20"
-              >
-                {isSearchOpen ? (
-                  <X className={isCondensed ? "h-5 w-5" : "h-6 w-6"} />
-                ) : (
-                  <Search className={isCondensed ? "h-5 w-5" : "h-6 w-6"} />
-                )}
-              </Button>
-            </div>
+            <SearchComponent
+              isCondensed={isCondensed}
+              headerHeight={headerHeight}
+            />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -241,34 +199,6 @@ export function Header() {
           </div>
         </motion.div>
       </motion.header>
-      <AnimatePresence>
-        {isSearchOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: "auto",
-              opacity: 1,
-              top: headerHeight,
-            }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{
-              height: { duration: 0.2 },
-              opacity: { duration: 0.2 },
-              top: { duration: 0.15 }, // Faster transition for position changes
-            }}
-            className="md:hidden fixed inset-x-0 z-40 overflow-hidden border-b border-gray-300 bg-white dark:bg-black px-6"
-          >
-            <div className="py-2">
-              <input
-                type="text"
-                placeholder="Search"
-                autoFocus
-                className="h-10 w-full border-b bg-transparent text-sm focus:outline-none border-gray-300 text-black placeholder:text-gray-500 dark:border-white/60 dark:text-white dark:placeholder:text-gray-300"
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }
