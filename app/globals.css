@@ -1,26 +1,239 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Base Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Typography */
+  --font-sans: var(--font-hanken-grotesk);
+
+  /* Card Colors */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  /* Popover Colors */
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Primary Colors */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* Secondary Colors */
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  /* Muted Colors */
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  /* Accent Colors - Magenta/pink for active states */
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* Link Color - Light blue */
+  --color-link: var(--link);
+
+  /* Destructive Color */
+  --color-destructive: var(--destructive);
+
+  /* Border and Input Colors */
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Chart Colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar Colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Footer Colors */
+  --color-footer: var(--footer);
+  --color-footer-foreground: var(--footer-foreground);
+
+  /* Brand Accent - Yellow/gold for hero sections */
+  --color-brand-accent: var(--brand-accent);
+
+  /* Border Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.625rem;
+
+  /* Base Colors - White background, dark text */
+  --background: oklch(1 0 0); /* Pure white #FFFFFF */
+  --foreground: oklch(0.145 0 0); /* Dark grey/black #1a1a1a */
+
+  /* Card Colors */
+  --card: oklch(1 0 0); /* White */
+  --card-foreground: oklch(0.145 0 0); /* Dark text */
+
+  /* Popover Colors */
+  --popover: oklch(1 0 0); /* White */
+  --popover-foreground: oklch(0.145 0 0); /* Dark text */
+
+  /* Primary - Dark for headings and important text */
+  --primary: oklch(0.145 0 0); /* Dark grey/black #1a1a1a */
+  --primary-foreground: oklch(1 0 0); /* White */
+
+  /* Secondary - Light grey background */
+  --secondary: oklch(0.97 0 0); /* Very light grey */
+  --secondary-foreground: oklch(0.145 0 0); /* Dark text */
+
+  /* Muted - For metadata and secondary text */
+  --muted: oklch(0.97 0 0); /* Very light grey background */
+  --muted-foreground: oklch(0.4 0 0); /* Medium grey #666666 */
+
+  /* Accent - Magenta/pink for active states (#E91E63) */
+  --accent: oklch(0.6 0.2 350); /* Vibrant magenta/pink */
+  --accent-foreground: oklch(1 0 0); /* White text on accent */
+
+  /* Link Color - Light blue (#0066CC / #0070F3) */
+  --link: oklch(0.5 0.15 250); /* Light blue */
+
+  /* Destructive - Red for errors */
+  --destructive: oklch(0.577 0.245 27.325);
+
+  /* Borders and Inputs - Light grey */
+  --border: oklch(0.922 0 0); /* Light grey border */
+  --input: oklch(0.922 0 0); /* Light grey input border */
+  --ring: oklch(0.6 0.2 350); /* Magenta ring for focus (matches accent) */
+
+  /* Chart Colors - Keep existing for data visualization */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Sidebar Colors - White background */
+  --sidebar: oklch(1 0 0); /* White */
+  --sidebar-foreground: oklch(0.145 0 0); /* Dark text */
+  --sidebar-primary: oklch(0.145 0 0); /* Dark for sidebar headings */
+  --sidebar-primary-foreground: oklch(1 0 0); /* White */
+  --sidebar-accent: oklch(0.97 0 0); /* Light grey for hover */
+  --sidebar-accent-foreground: oklch(0.6 0.2 350); /* Magenta for active link */
+  --sidebar-border: oklch(0.922 0 0); /* Light grey border */
+  --sidebar-ring: oklch(0.6 0.2 350); /* Magenta ring */
+
+  /* Footer Background - Light grey (#F0F0F0) */
+  --footer: oklch(0.95 0 0); /* Light grey #F0F0F0 */
+  --footer-foreground: oklch(0.145 0 0); /* Dark text */
+
+  /* Brand Accent - Warm yellow/gold (optional, for hero sections) */
+  --brand-accent: oklch(0.85 0.15 85); /* Warm yellow/gold #FFD700 */
+}
+
+.dark {
+  /* Base Colors - Dark background, light text */
+  --background: oklch(0.145 0 0); /* Dark grey/black */
+  --foreground: oklch(0.985 0 0); /* Light text */
+
+  /* Card Colors */
+  --card: oklch(0.205 0 0); /* Slightly lighter dark */
+  --card-foreground: oklch(0.985 0 0); /* Light text */
+
+  /* Popover Colors */
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+
+  /* Primary - Light text on dark */
+  --primary: oklch(0.922 0 0); /* Light grey */
+  --primary-foreground: oklch(0.145 0 0); /* Dark */
+
+  /* Secondary */
+  --secondary: oklch(0.269 0 0); /* Medium dark */
+  --secondary-foreground: oklch(0.985 0 0); /* Light text */
+
+  /* Muted */
+  --muted: oklch(0.269 0 0); /* Medium dark */
+  --muted-foreground: oklch(0.708 0 0); /* Medium grey */
+
+  /* Accent - Keep magenta/pink in dark mode */
+  --accent: oklch(0.6 0.2 350); /* Magenta/pink */
+  --accent-foreground: oklch(0.985 0 0); /* Light text */
+
+  /* Link Color - Lighter blue for dark mode */
+  --link: oklch(0.65 0.15 250); /* Lighter blue */
+
+  /* Destructive */
+  --destructive: oklch(0.704 0.191 22.216);
+
+  /* Borders and Inputs */
+  --border: oklch(1 0 0 / 10%); /* Subtle white border */
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.6 0.2 350); /* Magenta ring */
+
+  /* Chart Colors */
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+
+  /* Sidebar Colors */
+  --sidebar: oklch(0.205 0 0); /* Dark */
+  --sidebar-foreground: oklch(0.985 0 0); /* Light text */
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.6 0.2 350); /* Magenta for active */
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.6 0.2 350); /* Magenta */
+
+  /* Footer - Darker in dark mode */
+  --footer: oklch(0.2 0 0); /* Dark grey */
+  --footer-foreground: oklch(0.985 0 0); /* Light text */
+
+  /* Brand Accent */
+  --brand-accent: oklch(0.85 0.15 85); /* Keep yellow/gold */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  :root {
+    --header-height: 96px; /* Default header height fallback */
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-hanken-grotesk);
+  }
+  a {
+    text-underline-offset: 4px;
+  }
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+  html {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  html::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 }

@@ -1,0 +1,143 @@
+ROUTES STRUCTURE FOR KARTIKEYA SHARMA PORTFOLIO WEBSITE
+==========================================================
+
+Based on data.json, here are the required routes and their associated data:
+
+================================================================================
+1. HOME PAGE (/)
+================================================================================
+Purpose: Landing page introducing Kartikeya Sharma
+Data to display:
+- Hero section with name: "Kartikeya Sharma"
+- Tagline: "Material Science | Bioelectronics | Energy Harvesting"
+- Hero image (placeholder from Unsplash)
+- Brief introduction/overview
+- Quick links to main sections
+- Featured highlights (recent achievements, publications, or experiences)
+
+================================================================================
+2. ABOUT (/about)
+================================================================================
+Purpose: Personal and professional overview
+Data to display:
+- Full personal_information object:
+  * Name
+  * Tagline
+  * Email
+  * LinkedIn link
+  * ORCID link
+- Brief bio/introduction
+- Skills_and_expertise (all items as a list or categorized)
+- Education (all entries with degree, institution, duration)
+- Contact information
+
+================================================================================
+3. EXPERIENCE (/experience)
+================================================================================
+Purpose: Professional work history and research positions
+Data to display:
+- All entries from experiences array:
+  * Position title
+  * Duration
+  * Organization
+  * Institution
+  * Responsibilities (as bullet points)
+- Display in chronological order (most recent first)
+- Each experience as a card or detailed section
+
+================================================================================
+4. PUBLICATIONS (/publications)
+================================================================================
+Purpose: Academic publications and presentations
+Data to display:
+- All entries from publications_and_presentations array
+- Filter by type:
+  * Publications (type: "publication")
+  * Invited talks (type: "invited_talk")
+- For each publication:
+  * Title
+  * Publisher/Organization
+  * Year
+- Display in reverse chronological order (most recent first)
+- Optional: Group by year or type
+
+================================================================================
+5. ACHIEVEMENTS (/achievements)
+================================================================================
+Purpose: Awards, grants, and notable accomplishments
+Data to display:
+- All entries from achievements array:
+  * Title
+  * Date
+  * Description
+- Display in reverse chronological order (most recent first)
+- Each achievement as a card with prominent title
+
+================================================================================
+6. EXTRACURRICULAR (/extracurricular)
+================================================================================
+Purpose: Sports, coaching, and personal interests
+Data to display:
+- All data from hobbies_interests_and_extracurricular object:
+  * Student athlete achievements (with year)
+  * Sports coach roles (with year)
+  * Other interests (adventure sports, graphic design, 3D printing)
+- Display in organized sections:
+  * Student Athlete section
+  * Sports Coach section
+  * Other Interests section
+
+================================================================================
+7. CONTACT (/contact)
+================================================================================
+Purpose: Contact information and social links
+Data to display:
+- Email: kartikeya31@gmail.com
+- LinkedIn: /kartikeya-sharma31/
+- ORCID: /0000-0001-6981-1790/
+- Contact form (optional)
+- Social media links
+
+================================================================================
+ROUTE SUMMARY
+================================================================================
+
+Main Routes:
+1. / (Home) - Hero, introduction, featured content
+2. /about - Personal info, skills, education
+3. /experience - Work history and research positions
+4. /publications - Academic publications and talks
+5. /achievements - Awards and grants
+6. /extracurricular - Sports, coaching, interests
+7. /contact - Contact information
+
+Data Sources from data.json:
+- personal_information → /about, /contact
+- skills_and_expertise → /about
+- experiences → /experience
+- education → /about
+- achievements → /achievements
+- publications_and_presentations → /publications
+- hobbies_interests_and_extracurricular → /extracurricular
+
+================================================================================
+NAVIGATION STRUCTURE
+================================================================================
+
+Main Navigation Menu:
+- Home (/)
+- About (/about)
+- Experience (/experience)
+- Publications (/publications)
+- Achievements (/achievements)
+- Extracurricular (/extracurricular)
+- Contact (/contact)
+
+Footer Navigation:
+- Same links as main navigation
+- Social media links (LinkedIn, ORCID)
+- Email contact
+
+================================================================================
+END OF ROUTES DOCUMENTATION
+================================================================================

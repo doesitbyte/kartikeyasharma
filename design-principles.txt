@@ -1,0 +1,263 @@
+DESIGN PRINCIPLES FOR PORTFOLIO WEBSITE
+========================================
+
+This document outlines the core design principles to be followed throughout the portfolio website, based on the provided inspiration screenshots. These principles ensure a consistent, professional, and user-friendly experience across all pages.
+
+================================================================================
+1. COLOR PALETTE & VISUAL IDENTITY
+================================================================================
+
+PRIMARY COLORS:
+- Background: Predominantly white (#FFFFFF) for main content areas
+- Text: Dark grey/black (#000000 or #1a1a1a) for primary text and headings
+- Secondary Text: Light grey (#666666 or #888888) for descriptions, metadata, and supporting information
+
+ACCENT COLORS:
+- Active State: Vibrant magenta/pink (#E91E63 or similar) for active navigation links and selected states
+- Links: Distinct light blue (#0066CC or #0070F3) for clickable links, underlined when appropriate
+- Brand Accent: Consider a warm yellow/gold (#FFD700 or #FFC107) as an optional brand accent for hero sections or overlays
+
+FOOTER:
+- Background: Light grey (#F0F0F0 or #F5F5F5)
+- Text: Dark grey/black for readability
+- Border: Thin solid black line at the bottom edge
+
+IMAGERY:
+- Images should be high-quality, well-lit, and professionally presented
+- Consider subtle overlays (like yellow/gold tint) for hero sections to create brand consistency
+- Images should directly relate to and enhance the content they represent
+
+================================================================================
+2. TYPOGRAPHY
+================================================================================
+
+FONT FAMILY:
+- Use a single, modern, clean sans-serif font family throughout the entire website
+- Recommended: System fonts (SF Pro, Segoe UI) or web-safe alternatives (Inter, Helvetica, Arial)
+- Maintain consistency - avoid mixing multiple font families
+
+HIERARCHY:
+- Page Titles/Headings: Bold or semi-bold weight, large size (2.5rem - 3.5rem), dark color
+- Section Headings: Bold weight, medium-large size (1.5rem - 2rem), dark color
+- Project/Item Titles: Bold weight, medium size (1.25rem - 1.5rem), dark color or link blue
+- Body Text: Regular weight, readable size (1rem - 1.125rem), dark grey
+- Metadata/Secondary Info: Regular weight, smaller size (0.875rem - 0.9375rem), light grey
+- Navigation Links: Regular weight, medium size (1rem), dark grey (magenta when active)
+- Tags/Hashtags: Regular weight, small size (0.75rem - 0.875rem), light grey
+
+READABILITY:
+- Maintain high contrast between text and background (dark text on light background)
+- Use appropriate line-height (1.5 - 1.75) for body text
+- Ensure text is left-aligned for readability (except for specific design elements)
+
+================================================================================
+3. LAYOUT & STRUCTURE
+================================================================================
+
+GRID SYSTEM:
+- Implement a consistent, responsive grid system for all pages
+- Use a maximum content width (e.g., 1200px - 1400px) centered on the page
+- Maintain consistent padding/margins (e.g., 1.5rem - 2rem) around content
+
+TWO-COLUMN LAYOUT (for detail pages):
+- Left Sidebar: Narrower column (20-25% width) for navigation and contact information
+- Main Content: Wider column (75-80% width) for primary content
+- Sidebar should be white background with clear navigation hierarchy
+
+CARD-BASED PRESENTATION:
+- Use card-like structures for projects, publications, achievements, etc.
+- Each card should have:
+  * Clear boundaries (subtle border or shadow)
+  * Consistent internal padding (1.5rem - 2rem)
+  * High-quality image at the top (if applicable)
+  * Title (bold, prominent)
+  * Description (lighter, smaller)
+  * Metadata (smallest, lightest grey)
+
+HERO SECTIONS:
+- Full-width banner images with optional overlay (yellow/gold tint)
+- Large, bold headline text overlaid on image
+- White or light-colored text for contrast
+- Consider including logo/branding element
+
+FOOTER:
+- Multi-column layout (3 columns recommended)
+- Left: Logo and primary navigation links
+- Middle: Secondary navigation section ("More ways to explore")
+- Right: Social media icons, institutional branding, additional links
+- Light grey background (#F0F0F0)
+- Thin black border at bottom
+
+================================================================================
+4. SPACING & WHITESPACE
+================================================================================
+
+GENEROUS WHITESPACE:
+- Prioritize ample whitespace around all elements (text, images, sections)
+- Use consistent spacing scale (e.g., 0.5rem, 1rem, 1.5rem, 2rem, 3rem, 4rem)
+- Vertical spacing between sections: 3rem - 4rem minimum
+- Vertical spacing between items in lists: 1.5rem - 2rem
+- Padding within cards: 1.5rem - 2rem
+
+MINIMALISM:
+- Avoid excessive ornamentation or visual distractions
+- Keep design clean, straightforward, and focused on content
+- Let content breathe - don't overcrowd pages
+
+================================================================================
+5. NAVIGATION & INTERACTIVE ELEMENTS
+================================================================================
+
+HEADER:
+- Clean, fixed (sticky) header at the top
+- Logo/branding on the left
+- Minimalist icons on the right (profile, search, menu)
+- White or semi-transparent dark background
+- Simple, line-based icons
+
+SIDEBAR NAVIGATION:
+- Clear section header (e.g., "In this Group:" or "Navigation:")
+- List of navigation links below
+- Active link: Bold weight + magenta/pink color
+- Inactive links: Regular weight + dark grey
+- Hover state: Subtle color change or underline
+
+LINKS:
+- Clickable links: Light blue color (#0066CC)
+- Underline links when appropriate (especially in body text)
+- Hover state: Slightly darker blue or underline
+- External links: Consider adding an icon indicator
+
+BUTTONS:
+- Minimalist design with clear boundaries
+- Use accent colors sparingly for primary actions
+- Maintain consistent padding and sizing
+
+ICONS:
+- Simple, line-based, universally understood icons
+- Black or dark grey color
+- Consistent size (typically 16px - 24px)
+- Use icons for: downloads, email, social media, navigation
+
+================================================================================
+6. CONTENT PRESENTATION
+================================================================================
+
+PUBLICATIONS LIST:
+- Each entry should follow consistent structure:
+  1. Title (bold, large, dark or blue if clickable)
+  2. Authors/Affiliation/Journal (lighter grey, indented)
+  3. Download link (icon + text, light grey)
+  4. Keywords/Hashtags (small, light grey, with # prefix)
+
+PROJECTS SHOWCASE:
+- Grid layout (2-3 columns on desktop, responsive)
+- Each project card:
+  * High-quality image at top
+  * Title below image
+  * Brief description
+  * Metadata (tags, categories, dates)
+
+EXPERIENCE/EDUCATION:
+- Chronological list format
+- Clear date/duration indicators
+- Organization/institution names prominent
+- Responsibilities/achievements in bullet format
+
+ACHIEVEMENTS:
+- Card-based or list format
+- Highlight award/grant titles
+- Include dates and descriptions
+- Consider using icons or badges
+
+================================================================================
+7. RESPONSIVE DESIGN
+================================================================================
+
+MOBILE-FIRST APPROACH:
+- Design should work seamlessly on mobile devices
+- Stack columns vertically on smaller screens
+- Maintain readability and usability across all screen sizes
+- Touch-friendly interactive elements (minimum 44px touch targets)
+
+BREAKPOINTS:
+- Mobile: < 768px
+- Tablet: 768px - 1024px
+- Desktop: > 1024px
+
+================================================================================
+8. PROFESSIONAL TONE & AESTHETIC
+================================================================================
+
+ACADEMIC RIGOR:
+- Design should convey credibility and seriousness
+- Suitable for presenting professional and academic work
+- Avoid playful or casual design elements
+- Maintain professional tone throughout
+
+VISUAL CONSISTENCY:
+- All pages should feel cohesive and part of the same website
+- Consistent use of colors, typography, spacing, and layout patterns
+- Predictable navigation and interaction patterns
+
+CONTENT-FOCUSED:
+- Design should enhance, not distract from content
+- Let high-quality images and well-written text be the stars
+- Use design to guide the eye and improve readability
+
+================================================================================
+9. ACCESSIBILITY
+================================================================================
+
+CONTRAST:
+- Ensure sufficient contrast between text and background (WCAG AA minimum)
+- Dark text on light backgrounds for optimal readability
+
+NAVIGATION:
+- Clear, logical navigation structure
+- Breadcrumbs or "back" links where appropriate
+- Active state indicators for current page
+
+INTERACTIVE ELEMENTS:
+- Clear visual indicators for clickable elements
+- Hover states for better user feedback
+- Focus states for keyboard navigation
+
+================================================================================
+10. IMPLEMENTATION NOTES
+================================================================================
+
+COMPONENT CONSISTENCY:
+- Create reusable components for: cards, navigation, headers, footers
+- Maintain consistent styling across similar elements
+- Use a design system or component library approach
+
+PERFORMANCE:
+- Optimize images for web (appropriate formats, sizes)
+- Ensure fast page load times
+- Lazy load images where appropriate
+
+BRANDING:
+- Incorporate distinctive logo/branding element
+- Use consistent brand colors throughout
+- Maintain brand identity across all pages
+
+================================================================================
+SUMMARY CHECKLIST
+================================================================================
+
+For every page, ensure:
+✓ Clean, minimalist aesthetic with generous whitespace
+✓ Consistent typography hierarchy (sans-serif font family)
+✓ Professional color palette (white, dark grey, magenta accent, blue links)
+✓ Clear content structure and visual hierarchy
+✓ Intuitive navigation with active state indicators
+✓ High-quality, relevant imagery
+✓ Responsive design that works on all devices
+✓ Accessible contrast and interactive elements
+✓ Consistent spacing and layout patterns
+✓ Professional, academic tone throughout
+
+================================================================================
+END OF DESIGN PRINCIPLES
+================================================================================
