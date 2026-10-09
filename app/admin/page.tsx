@@ -284,7 +284,7 @@ export default function AdminPage() {
         </div>
 
         <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500 rounded-md text-blue-600 dark:text-blue-400">
-          <strong>Note:</strong> Data is loaded from Upstash Redis. Enter your
+          <strong>Note:</strong> Data is loaded from Vercel Blob. Enter your
           password below to save changes.
         </div>
 

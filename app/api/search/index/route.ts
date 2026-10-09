@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { redis, REDIS_KEYS } from "@/lib/redis";
+import { store, STORE_KEYS } from "@/lib/store";
 import type { SearchIndexEntry } from "@/lib/search-index";
 
 /**
  * GET /api/search/index
- * Fetches the search index from Upstash
+ * Fetches the search index from Vercel Blob
  * No authentication required - index is safe to expose
  */
 export async function GET() {
   try {
-    const index = await redis.get<SearchIndexEntry[]>(REDIS_KEYS.search_index);
+    const index = await store.get<SearchIndexEntry[]>(STORE_KEYS.search_index);
 
     if (!index) {
       return NextResponse.json(

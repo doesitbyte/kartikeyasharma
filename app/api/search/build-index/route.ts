@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { redis, REDIS_KEYS } from "@/lib/redis";
+import { store, STORE_KEYS } from "@/lib/store";
 import { getAllData } from "@/lib/get-data";
 import { buildSearchIndex } from "@/lib/search-index";
 
 /**
  * POST /api/search/build-index
- * Builds the search index from all data and saves it to Upstash
+ * Builds the search index from all data and saves it to Vercel Blob
  * Requires admin password authentication
  */
 export async function POST(request: NextRequest) {
@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
     // Build search index
     const searchIndex = buildSearchIndex(data);
 
-    // Save to Upstash
-    await redis.set(REDIS_KEYS.search_index, searchIndex);
+    // Save to Vercel Blob
+    await store.set(STORE_KEYS.search_index, searchIndex);
 
     return NextResponse.json({
       success: true,

@@ -1,4 +1,4 @@
-// Static data fallback for TypeScript compatibility (used only if Redis fails)
+// Static data fallback for TypeScript compatibility (used only if the Blob store fails)
 export const data = {
   personal_information: {
     name: "Kartikeya Sharma",

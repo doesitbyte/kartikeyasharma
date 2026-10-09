@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { redis, REDIS_KEYS } from "@/lib/redis";
+import { store, STORE_KEYS } from "@/lib/store";
 import type { data as DataType } from "@/lib/data";
 
 type Section =
@@ -12,7 +12,7 @@ type Section =
   | "hobbies_interests_and_extracurricular"
   | "ui_content";
 
-const SECTION_TO_KEY: Record<Section, keyof typeof REDIS_KEYS> = {
+const SECTION_TO_KEY: Record<Section, keyof typeof STORE_KEYS> = {
   personal_information: "personal_info",
   skills_and_expertise: "skills",
   experiences: "experiences",
@@ -34,8 +34,8 @@ export async function GET(
       return NextResponse.json({ error: "Invalid section" }, { status: 400 });
     }
 
-    const redisKey = REDIS_KEYS[SECTION_TO_KEY[section]];
-    const data = await redis.get(redisKey);
+    const storeKey = STORE_KEYS[SECTION_TO_KEY[section]];
+    const data = await store.get(storeKey);
 
     if (!data) {
       return NextResponse.json({ error: "Section not found" }, { status: 404 });
@@ -74,8 +74,8 @@ export async function POST(
       return NextResponse.json({ error: "Data is required" }, { status: 400 });
     }
 
-    const redisKey = REDIS_KEYS[SECTION_TO_KEY[section]];
-    await redis.set(redisKey, data);
+    const storeKey = STORE_KEYS[SECTION_TO_KEY[section]];
+    await store.set(storeKey, data);
 
     return NextResponse.json({ success: true });
   } catch (error) {
