@@ -1242,6 +1242,14 @@ function UIContentEditor({
 }) {
   const [jsonText, setJsonText] = useState(JSON.stringify(uiContent, null, 2));
   const [jsonError, setJsonError] = useState<string | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const copyUploadedUrl = async () => {
+    await navigator.clipboard.writeText(uploadedUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     setJsonText(JSON.stringify(uiContent, null, 2));
@@ -1264,6 +1272,24 @@ function UIContentEditor({
       <p className="text-sm text-muted-foreground">
         Edit UI content as JSON. Be careful with the structure.
       </p>
+      <div className="border border-border rounded-lg p-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium">Upload an image</label>
+          <Button
+            onClick={copyUploadedUrl}
+            variant="outline"
+            size="sm"
+            disabled={!uploadedUrl}
+          >
+            {copied ? "Copied!" : "Copy URL"}
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Upload a file, then paste its URL into the matching image field in
+          the JSON below.
+        </p>
+        <ImageField value={uploadedUrl} onChange={setUploadedUrl} />
+      </div>
       {jsonError && (
         <div className="p-2 bg-destructive/10 border border-destructive rounded text-destructive text-sm">
           {jsonError}
