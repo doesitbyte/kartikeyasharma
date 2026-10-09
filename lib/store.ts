@@ -51,3 +51,6 @@ export const STORE_KEYS = {
   ui_content: "portfolio/ui_content.json",
   search_index: "portfolio/search_index.json",
 } as const;
+
+// Uploaded images live under this prefix and are served via /api/images
+export const IMAGES_PREFIX = "images/";

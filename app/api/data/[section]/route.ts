@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { store, STORE_KEYS } from "@/lib/store";
+import { getAllData } from "@/lib/get-data";
+import { buildSearchIndex } from "@/lib/search-index";
 import type { data as DataType } from "@/lib/data";
 
 type Section =
@@ -76,6 +79,13 @@ export async function POST(
 
     const storeKey = STORE_KEYS[SECTION_TO_KEY[section]];
     await store.set(storeKey, data);
+
+    // Keep search results in sync with the saved content
+    const searchIndex = buildSearchIndex(await getAllData());
+    await store.set(STORE_KEYS.search_index, searchIndex);
+
+    // Pages are prerendered, so regenerate them with the new content
+    revalidatePath("/", "layout");
 
     return NextResponse.json({ success: true });
   } catch (error) {

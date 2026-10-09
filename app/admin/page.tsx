@@ -1,9 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { fetchAllData, updateSection, rebuildSearchIndex, type Section } from "@/lib/api";
+import {
+  fetchAllData,
+  updateSection,
+  rebuildSearchIndex,
+  uploadImage,
+  type Section,
+} from "@/lib/api";
 import { data } from "@/lib/data";
 type DataType = typeof data;
 
@@ -17,6 +23,9 @@ type DeepMutable<T> = T extends readonly (infer U)[]
   : T;
 
 type MutableDataType = DeepMutable<DataType>;
+
+// Admin password, used by image fields to authorize uploads
+const PasswordContext = createContext("");
 
 export default function AdminPage() {
   const [localData, setLocalData] = useState<MutableDataType | null>(null);
@@ -333,88 +342,90 @@ export default function AdminPage() {
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <div className="bg-card border border-border rounded-lg p-6">
-              {activeSection === "personal_information" && (
-                <PersonalInformationEditor
-                  data={localData.personal_information}
-                  onChange={(field, value) =>
-                    updateNestedValue(["personal_information", field], value)
-                  }
-                />
-              )}
+            <PasswordContext.Provider value={password}>
+              <div className="bg-card border border-border rounded-lg p-6">
+                {activeSection === "personal_information" && (
+                  <PersonalInformationEditor
+                    data={localData.personal_information}
+                    onChange={(field, value) =>
+                      updateNestedValue(["personal_information", field], value)
+                    }
+                  />
+                )}
 
-              {activeSection === "skills_and_expertise" && (
-                <ArrayEditor
-                  items={localData.skills_and_expertise}
-                  label="Skill"
-                  onChange={(items) =>
-                    updateNestedValue(["skills_and_expertise"], items)
-                  }
-                />
-              )}
+                {activeSection === "skills_and_expertise" && (
+                  <ArrayEditor
+                    items={localData.skills_and_expertise}
+                    label="Skill"
+                    onChange={(items) =>
+                      updateNestedValue(["skills_and_expertise"], items)
+                    }
+                  />
+                )}
 
-              {activeSection === "experiences" && (
-                <ExperiencesEditor
-                  experiences={localData.experiences}
-                  onChange={(experiences) =>
-                    updateNestedValue(["experiences"], experiences)
-                  }
-                />
-              )}
+                {activeSection === "experiences" && (
+                  <ExperiencesEditor
+                    experiences={localData.experiences}
+                    onChange={(experiences) =>
+                      updateNestedValue(["experiences"], experiences)
+                    }
+                  />
+                )}
 
-              {activeSection === "education" && (
-                <EducationEditor
-                  education={localData.education}
-                  onChange={(education) =>
-                    updateNestedValue(["education"], education)
-                  }
-                />
-              )}
+                {activeSection === "education" && (
+                  <EducationEditor
+                    education={localData.education}
+                    onChange={(education) =>
+                      updateNestedValue(["education"], education)
+                    }
+                  />
+                )}
 
-              {activeSection === "achievements" && (
-                <AchievementsEditor
-                  achievements={localData.achievements}
-                  onChange={(achievements) =>
-                    updateNestedValue(["achievements"], achievements)
-                  }
-                />
-              )}
+                {activeSection === "achievements" && (
+                  <AchievementsEditor
+                    achievements={localData.achievements}
+                    onChange={(achievements) =>
+                      updateNestedValue(["achievements"], achievements)
+                    }
+                  />
+                )}
 
-              {activeSection === "publications_and_presentations" && (
-                <PublicationsEditor
-                  publications={localData.publications_and_presentations}
-                  onChange={(publications) =>
-                    updateNestedValue(
-                      ["publications_and_presentations"],
-                      publications
-                    )
-                  }
-                />
-              )}
+                {activeSection === "publications_and_presentations" && (
+                  <PublicationsEditor
+                    publications={localData.publications_and_presentations}
+                    onChange={(publications) =>
+                      updateNestedValue(
+                        ["publications_and_presentations"],
+                        publications
+                      )
+                    }
+                  />
+                )}
 
-              {activeSection === "hobbies_interests_and_extracurricular" && (
-                <ExtracurricularEditor
-                  extracurricular={
-                    localData.hobbies_interests_and_extracurricular
-                  }
-                  onChange={(extracurricular) =>
-                    updateNestedValue(
-                      ["hobbies_interests_and_extracurricular"],
-                      extracurricular
-                    )
-                  }
-                />
-              )}
+                {activeSection === "hobbies_interests_and_extracurricular" && (
+                  <ExtracurricularEditor
+                    extracurricular={
+                      localData.hobbies_interests_and_extracurricular
+                    }
+                    onChange={(extracurricular) =>
+                      updateNestedValue(
+                        ["hobbies_interests_and_extracurricular"],
+                        extracurricular
+                      )
+                    }
+                  />
+                )}
 
-              {activeSection === "ui_content" && (
-                <UIContentEditor
-                  uiContent={localData.ui_content}
-                  onChange={(uiContent) =>
-                    updateNestedValue(["ui_content"], uiContent)
-                  }
-                />
-              )}
-            </div>
+                {activeSection === "ui_content" && (
+                  <UIContentEditor
+                    uiContent={localData.ui_content}
+                    onChange={(uiContent) =>
+                      updateNestedValue(["ui_content"], uiContent)
+                    }
+                  />
+                )}
+              </div>
+            </PasswordContext.Provider>
           </div>
         </div>
       </div>
@@ -599,14 +610,21 @@ function ExperiencesEditor({
                   <label className="block text-sm font-medium mb-1 capitalize">
                     {key.replace(/_/g, " ")}
                   </label>
-                  <input
-                    type="text"
-                    value={String(value ?? "")}
-                    onChange={(e) =>
-                      updateExperience(expIndex, key, e.target.value)
-                    }
-                    className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
+                  {key === "image" ? (
+                    <ImageField
+                      value={String(value ?? "")}
+                      onChange={(v) => updateExperience(expIndex, key, v)}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={String(value ?? "")}
+                      onChange={(e) =>
+                        updateExperience(expIndex, key, e.target.value)
+                      }
+                      className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  )}
                 </div>
               ))}
           </div>
@@ -707,12 +725,19 @@ function EducationEditor({
                 <label className="block text-sm font-medium mb-1 capitalize">
                   {key.replace(/_/g, " ")}
                 </label>
-                <input
-                  type="text"
-                  value={String(value ?? "")}
-                  onChange={(e) => updateEducation(index, key, e.target.value)}
-                  className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                />
+                {key === "image" ? (
+                  <ImageField
+                    value={String(value ?? "")}
+                    onChange={(v) => updateEducation(index, key, v)}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={String(value ?? "")}
+                    onChange={(e) => updateEducation(index, key, e.target.value)}
+                    className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -790,14 +815,21 @@ function AchievementsEditor({
                     className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring min-h-[100px]"
                   />
                 ) : (
-                  <input
-                    type="text"
-                    value={String(value ?? "")}
-                    onChange={(e) =>
-                      updateAchievement(index, key, e.target.value)
-                    }
-                    className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
+                  key === "image" ? (
+                    <ImageField
+                      value={String(value ?? "")}
+                      onChange={(v) => updateAchievement(index, key, v)}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={String(value ?? "")}
+                      onChange={(e) =>
+                        updateAchievement(index, key, e.target.value)
+                      }
+                      className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  )
                 )}
               </div>
             ))}
@@ -906,14 +938,21 @@ function PublicationsEditor({
                       className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                   ) : (
-                    <input
-                      type="text"
-                      value={String(value ?? "")}
-                      onChange={(e) =>
-                        updatePublication(index, key, e.target.value)
-                      }
-                      className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                    />
+                    key === "image" ? (
+                      <ImageField
+                        value={String(value ?? "")}
+                        onChange={(v) => updatePublication(index, key, v)}
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value={String(value ?? "")}
+                        onChange={(e) =>
+                          updatePublication(index, key, e.target.value)
+                        }
+                        className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                    )
                   )}
                 </div>
               ))}
@@ -1034,14 +1073,21 @@ function ExtracurricularEditor({
                     className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 ) : (
-                  <input
-                    type="text"
-                    value={String(value ?? "")}
-                    onChange={(e) =>
-                      updateStudentAthlete(index, key, e.target.value)
-                    }
-                    className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
+                  key === "image" ? (
+                    <ImageField
+                      value={String(value ?? "")}
+                      onChange={(v) => updateStudentAthlete(index, key, v)}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={String(value ?? "")}
+                      onChange={(e) =>
+                        updateStudentAthlete(index, key, e.target.value)
+                      }
+                      className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  )
                 )}
               </div>
             ))}
@@ -1095,18 +1141,25 @@ function ExtracurricularEditor({
                 <label className="block text-sm font-medium mb-1 capitalize">
                   {key.replace(/_/g, " ")}
                 </label>
-                <input
-                  type="text"
-                  value={String(value ?? "")}
-                  onChange={(e) =>
-                    updateSportsCoach(
-                      index,
-                      key,
-                      key === "year" ? e.target.value : e.target.value
-                    )
-                  }
-                  className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                />
+                {key === "image" ? (
+                  <ImageField
+                    value={String(value ?? "")}
+                    onChange={(v) => updateSportsCoach(index, key, v)}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={String(value ?? "")}
+                    onChange={(e) =>
+                      updateSportsCoach(
+                        index,
+                        key,
+                        key === "year" ? e.target.value : e.target.value
+                      )
+                    }
+                    className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -1157,12 +1210,19 @@ function ExtracurricularEditor({
                 <label className="block text-sm font-medium mb-1 capitalize">
                   {key.replace(/_/g, " ")}
                 </label>
-                <input
-                  type="text"
-                  value={String(value ?? "")}
-                  onChange={(e) => updateOthers(index, key, e.target.value)}
-                  className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                />
+                {key === "image" ? (
+                  <ImageField
+                    value={String(value ?? "")}
+                    onChange={(v) => updateOthers(index, key, v)}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={String(value ?? "")}
+                    onChange={(e) => updateOthers(index, key, e.target.value)}
+                    className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -1214,6 +1274,75 @@ function UIContentEditor({
         onChange={(e) => handleJsonChange(e.target.value)}
         className="w-full px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring font-mono text-sm min-h-[600px]"
       />
+    </div>
+  );
+}
+
+// Component for an image field: URL input plus direct upload
+function ImageField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const password = useContext(PasswordContext);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return;
+    if (!password) {
+      setUploadError("Enter the password above to upload images");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setUploadError(null);
+      onChange(await uploadImage(file, password));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Paste an image URL or upload a file"
+          className="flex-1 min-w-0 px-4 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        />
+        <Button asChild variant="outline">
+          <label className="cursor-pointer">
+            {uploading ? "Uploading..." : "Upload"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={uploading}
+              onChange={(e) => {
+                handleFile(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </label>
+        </Button>
+      </div>
+      {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
+      {value && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={value}
+          alt="Preview"
+          className="h-32 w-auto rounded-md border border-border object-cover"
+        />
+      )}
     </div>
   );
 }

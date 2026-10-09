@@ -1,3 +1,4 @@
+import { upload } from "@vercel/blob/client";
 import type { data as DataType } from "./data";
 
 const API_BASE = "/api/data";
@@ -84,4 +85,24 @@ export async function rebuildSearchIndex(password: string): Promise<{ count: num
   }
 
   return response.json();
+}
+
+/**
+ * Upload an image straight to Vercel Blob (requires authentication)
+ * Returns the URL to store in the content
+ */
+export async function uploadImage(file: File, password: string): Promise<string> {
+  const blob = await upload(`images/${file.name}`, file, {
+    access: "private",
+    handleUploadUrl: "/api/upload",
+    clientPayload: password,
+  }).catch((err: Error) => {
+    // The token request is where the password and file are checked
+    if (err.message.includes("client token")) {
+      throw new Error("Upload rejected: check the password and that the file is an image under 10 MB");
+    }
+    throw err;
+  });
+
+  return `/api/images/${blob.pathname.replace(/^images\//, "")}`;
 }
